@@ -5,7 +5,6 @@ import {
   PORTRAIT,
   PORTRAIT_ASPECT_RATIO,
   SERIES,
-  CARD_BACK_PATH,
   FONTS,
   TEXT_ZONES,
   CHAR_LIMITS,
@@ -46,10 +45,6 @@ describe('layout-constants', () => {
   it('series IDs are unique', () => {
     const ids = SERIES.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
-  });
-
-  it('card back path is defined', () => {
-    expect(CARD_BACK_PATH).toBe('/frames/back.jpg');
   });
 
   it('font config has Aileron family with 3 variants', () => {

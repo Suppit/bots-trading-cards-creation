@@ -51,12 +51,23 @@ A mobile-first web app (PWA) where users create personalized digital BOTS tradin
 - GlobalErrorHandler (`src/components/GlobalErrorHandler.tsx`) — catches window.onerror and unhandled promise rejections
 - Layout wired: ErrorBoundary → GlobalErrorHandler → children
 
-### Phase 2: Asset Preparation & Preloading ✅
+### Phase 2: Asset Preparation & Preloading ✅ (tagged: `phase-2`)
 - **Frame images** — 5 transparent PNGs in `app/public/frames/` (series-1.png through specialty.png + back.jpg), all 1499×2098
 - **Aileron fonts** — Regular, Bold, BoldItalic .otf files in `app/public/fonts/`, loaded via @font-face in globals.css
 - **Layout constants** (`src/lib/layout-constants.ts`) — card dimensions, portrait mask (114:97), text zone positions & font specs, series metadata, character limits. Positions derived from reference templates; may need fine-tuning during Canvas rendering.
 - **Preloader service** (`src/lib/preloader.ts`) — loads all frames + card back + fonts with progress callbacks, caches images in memory, logs each asset with timing
-- **Font loading** — Aileron set as primary font (replacing Geist), @font-face in CSS + FontFace API in preloader for Canvas use
+- **Font loading** — Aileron for Canvas card rendering via @font-face + FontFace API in preloader
+
+### Phase 3: Start Screen & App Shell ✅ (tagged: `phase-3`)
+- **AppContext** (`src/contexts/AppContext.tsx`) — React Context holding PreloadResult, current step, preload progress/error, retry. useRef guard for Strict Mode.
+- **BotsLogo** (`src/components/BotsLogo.tsx`) — Inline SVG logo (blue #035ba7 + orange #e75625 heart)
+- **StartScreen** (`src/components/StartScreen.tsx`) — Full-screen start UI: logo, "Create Your Trading Card" tagline, Start button (48px+ touch target), preload progress bar, error/retry handling
+- **AppFlow** (`src/components/AppFlow.tsx`) — Step-based view router (start → photo-capture → text-entry → card-reveal → series-swipe → export)
+- **PlaceholderScreen** (`src/components/PlaceholderScreen.tsx`) — Temporary screen for phases not yet built
+- **UI font** — Figtree via `next/font/google` (Aileron remains for Canvas only)
+- **Light mode only** — dark mode media query removed
+- **Cleaned up** — removed Next.js boilerplate SVGs and default page content
+- **Testing** — @testing-library/react + jsdom; 27 tests passing across 4 test files
 
 ## Build & Run
 ```bash

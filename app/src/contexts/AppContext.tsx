@@ -20,6 +20,15 @@ export type AppStep =
   | 'series-swipe'
   | 'export';
 
+export interface PhotoData {
+  blob: Blob;
+  width: number;
+  height: number;
+  originalWidth: number;
+  originalHeight: number;
+  originalSizeKB: number;
+}
+
 interface AppState {
   step: AppStep;
   setStep: (step: AppStep) => void;
@@ -28,6 +37,8 @@ interface AppState {
   preloadError: string | null;
   isPreloadComplete: boolean;
   retryPreload: () => void;
+  croppedPhoto: PhotoData | null;
+  setCroppedPhoto: (photo: PhotoData | null) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -53,6 +64,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [preloadResult, setPreloadResult] = useState<PreloadResult | null>(null);
   const [preloadProgress, setPreloadProgress] = useState<PreloadProgress | null>(null);
   const [preloadError, setPreloadError] = useState<string | null>(null);
+  const [croppedPhoto, setCroppedPhoto] = useState<PhotoData | null>(null);
   const hasStartedRef = useRef(false);
 
   const runPreload = useCallback(async () => {
@@ -97,6 +109,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         preloadError,
         isPreloadComplete,
         retryPreload,
+        croppedPhoto,
+        setCroppedPhoto,
       }}
     >
       {children}

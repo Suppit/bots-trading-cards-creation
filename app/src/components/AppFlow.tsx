@@ -2,7 +2,9 @@
 
 import { useEffect, useRef } from 'react';
 import { useAppContext } from '@/contexts/AppContext';
+import { WizardStepper } from './WizardStepper';
 import { StartScreen } from './StartScreen';
+import { PhotoCapture } from './PhotoCapture';
 import { PlaceholderScreen } from './PlaceholderScreen';
 import { createLogger } from '@/lib/logger';
 
@@ -19,10 +21,21 @@ export function AppFlow() {
     }
   }, [step]);
 
-  switch (step) {
-    case 'start':
-      return <StartScreen />;
-    default:
-      return <PlaceholderScreen step={step} />;
+  function renderScreen() {
+    switch (step) {
+      case 'start':
+        return <StartScreen />;
+      case 'photo-capture':
+        return <PhotoCapture />;
+      default:
+        return <PlaceholderScreen step={step} />;
+    }
   }
+
+  return (
+    <>
+      <WizardStepper currentStep={step} />
+      {renderScreen()}
+    </>
+  );
 }

@@ -62,8 +62,8 @@ describe('preloader', () => {
 
     await preloadAssets(onProgress);
 
-    // 5 frames + 1 card back + 1 fonts = 7 assets
-    expect(onProgress).toHaveBeenCalledTimes(7);
+    // 5 frames + 1 fonts = 6 assets
+    expect(onProgress).toHaveBeenCalledTimes(6);
   });
 
   it('progress reaches 100%', async () => {
@@ -83,7 +83,6 @@ describe('preloader', () => {
     const result = await preloadAssets();
 
     expect(result).toHaveProperty('frames');
-    expect(result).toHaveProperty('cardBack');
     expect(result).toHaveProperty('fontsReady');
     expect(result).toHaveProperty('totalTimeMs');
     expect(result.frames).toBeInstanceOf(Map);

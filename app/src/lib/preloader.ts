@@ -1,5 +1,5 @@
 import { createLogger } from './logger';
-import { SERIES, CARD_BACK_PATH, FONTS } from './layout-constants';
+import { SERIES, FONTS } from './layout-constants';
 
 const log = createLogger('Preloader');
 
@@ -19,7 +19,6 @@ export type ProgressCallback = (progress: PreloadProgress) => void;
 
 export interface PreloadResult {
   frames: Map<string, HTMLImageElement>;
-  cardBack: HTMLImageElement;
   fontsReady: boolean;
   totalTimeMs: number;
 }
@@ -71,7 +70,7 @@ async function loadFonts(): Promise<boolean> {
 // ---------------------------------------------------------------------------
 
 /**
- * Preloads all card frames, the card back, and fonts.
+ * Preloads all card frames and fonts.
  * Calls `onProgress` after each asset finishes loading.
  * Returns cached image elements and font-ready status.
  */
@@ -83,7 +82,7 @@ export async function preloadAssets(
 
   // Build the list of assets to track progress
   const frameEntries = SERIES.map((s) => ({ id: s.id, path: s.framePath }));
-  const totalAssets = frameEntries.length + 1 /* card back */ + 1 /* fonts */;
+  const totalAssets = frameEntries.length + 1 /* fonts */;
   let loaded = 0;
 
   function reportProgress(assetName: string) {
@@ -112,7 +111,7 @@ export async function preloadAssets(
     reportProgress('Aileron fonts (failed)');
   }
 
-  // Load all frame images and card back in parallel
+  // Load all frame images in parallel
   const frames = new Map<string, HTMLImageElement>();
   const imagePromises: Promise<void>[] = [];
 
@@ -133,21 +132,6 @@ export async function preloadAssets(
     );
   }
 
-  let cardBack!: HTMLImageElement;
-  imagePromises.push(
-    loadImage(CARD_BACK_PATH)
-      .then((img) => {
-        cardBack = img;
-        reportProgress('card-back');
-      })
-      .catch((err) => {
-        log.error('Failed to load card back', {
-          error: err instanceof Error ? err.message : String(err),
-        });
-        reportProgress('card-back (failed)');
-      }),
-  );
-
   await Promise.all(imagePromises);
 
   const totalTimeMs = Math.round(performance.now() - startTime);
@@ -157,5 +141,5 @@ export async function preloadAssets(
     fontsReady,
   });
 
-  return { frames, cardBack, fontsReady, totalTimeMs };
+  return { frames, fontsReady, totalTimeMs };
 }
