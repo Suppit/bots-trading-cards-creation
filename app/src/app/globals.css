@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ----- Aileron font-face declarations (for UI and Canvas rendering) ----- */
+/* ----- Aileron font-face declarations (for Canvas card rendering) ----- */
 
 @font-face {
   font-family: 'Aileron';
@@ -36,18 +36,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Aileron', Arial, Helvetica, sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-figtree), 'Aileron', Arial, Helvetica, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Aileron', Arial, Helvetica, sans-serif;
+  font-family: var(--font-figtree), 'Aileron', Arial, Helvetica, sans-serif;
 }

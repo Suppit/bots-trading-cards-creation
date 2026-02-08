@@ -1,7 +1,14 @@
 import type { Metadata } from 'next';
+import { Figtree } from 'next/font/google';
 import './globals.css';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { GlobalErrorHandler } from '@/components/GlobalErrorHandler';
+import { AppProvider } from '@/contexts/AppContext';
+
+const figtree = Figtree({
+  subsets: ['latin'],
+  variable: '--font-figtree',
+});
 
 export const metadata: Metadata = {
   title: 'BOTS Trading Card Creator',
@@ -15,9 +22,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`${figtree.variable} antialiased`}>
         <ErrorBoundary>
-          <GlobalErrorHandler>{children}</GlobalErrorHandler>
+          <GlobalErrorHandler>
+            <AppProvider>{children}</AppProvider>
+          </GlobalErrorHandler>
         </ErrorBoundary>
       </body>
     </html>
