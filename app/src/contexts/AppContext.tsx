@@ -29,6 +29,13 @@ export interface PhotoData {
   originalSizeKB: number;
 }
 
+export interface CardFormData {
+  title: string;
+  tagline: string;
+  funFact: string;
+  proTip: string;
+}
+
 interface AppState {
   step: AppStep;
   setStep: (step: AppStep) => void;
@@ -39,6 +46,8 @@ interface AppState {
   retryPreload: () => void;
   croppedPhoto: PhotoData | null;
   setCroppedPhoto: (photo: PhotoData | null) => void;
+  formData: CardFormData | null;
+  setFormData: (data: CardFormData | null) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -65,6 +74,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [preloadProgress, setPreloadProgress] = useState<PreloadProgress | null>(null);
   const [preloadError, setPreloadError] = useState<string | null>(null);
   const [croppedPhoto, setCroppedPhoto] = useState<PhotoData | null>(null);
+  const [formData, setFormData] = useState<CardFormData | null>(null);
   const hasStartedRef = useRef(false);
 
   const runPreload = useCallback(async () => {
@@ -111,6 +121,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         retryPreload,
         croppedPhoto,
         setCroppedPhoto,
+        formData,
+        setFormData,
       }}
     >
       {children}

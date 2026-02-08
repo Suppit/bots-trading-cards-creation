@@ -7,6 +7,7 @@ import { StartScreen } from '../StartScreen';
 const mockSetStep = vi.fn();
 const mockRetryPreload = vi.fn();
 const mockSetCroppedPhoto = vi.fn();
+const mockSetFormData = vi.fn();
 
 let mockContextValue = {
   step: 'start' as const,
@@ -18,6 +19,8 @@ let mockContextValue = {
   retryPreload: mockRetryPreload,
   croppedPhoto: null,
   setCroppedPhoto: mockSetCroppedPhoto,
+  formData: null,
+  setFormData: mockSetFormData,
 };
 
 vi.mock('@/contexts/AppContext', () => ({
@@ -50,6 +53,8 @@ describe('StartScreen', () => {
       retryPreload: mockRetryPreload,
       croppedPhoto: null,
       setCroppedPhoto: mockSetCroppedPhoto,
+      formData: null,
+      setFormData: mockSetFormData,
     };
   });
 

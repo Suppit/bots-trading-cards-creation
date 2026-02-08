@@ -5,6 +5,7 @@ import { useAppContext } from '@/contexts/AppContext';
 import { WizardStepper } from './WizardStepper';
 import { StartScreen } from './StartScreen';
 import { PhotoCapture } from './PhotoCapture';
+import { TextEntry } from './TextEntry';
 import { PlaceholderScreen } from './PlaceholderScreen';
 import { createLogger } from '@/lib/logger';
 
@@ -27,6 +28,8 @@ export function AppFlow() {
         return <StartScreen />;
       case 'photo-capture':
         return <PhotoCapture />;
+      case 'text-entry':
+        return <TextEntry />;
       default:
         return <PlaceholderScreen step={step} />;
     }

@@ -17,6 +17,8 @@ vi.mock('@/contexts/AppContext', () => ({
     preloadError: null,
     isPreloadComplete: true,
     retryPreload: vi.fn(),
+    formData: null,
+    setFormData: vi.fn(),
   }),
 }));
 
