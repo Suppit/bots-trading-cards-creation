@@ -54,7 +54,7 @@ function getCounterColor(length: number, max: number): string {
 }
 
 export function TextEntry() {
-  const { setStep, setFormData } = useAppContext();
+  const { setStep, setFormData, stylizationStatus } = useAppContext();
 
   const [values, setValues] = useState({
     title: '',
@@ -131,6 +131,23 @@ export function TextEntry() {
     >
       <h2 className="text-center text-xl font-bold">Add Your Details</h2>
 
+      {stylizationStatus === 'processing' && (
+        <div className="flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-2 text-sm text-[#035ba7]" data-testid="stylization-status">
+          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[#035ba7] border-t-transparent" />
+          Stylizing your photo...
+        </div>
+      )}
+      {stylizationStatus === 'complete' && (
+        <div className="rounded-lg bg-green-50 px-4 py-2 text-sm text-green-700" data-testid="stylization-status">
+          Photo stylized!
+        </div>
+      )}
+      {stylizationStatus === 'failed' && (
+        <div className="rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-700" data-testid="stylization-status">
+          Stylization failed. Your original photo will be used.
+        </div>
+      )}
+
       {FIELDS.map((field) => {
         const value = values[field.key];
         const counterColor = getCounterColor(value.length, field.maxLength);
@@ -202,14 +219,27 @@ export function TextEntry() {
         );
       })}
 
-      <button
-        type="submit"
-        disabled={!isValid}
-        className="mt-2 min-h-[48px] w-full rounded-full bg-[#035ba7] px-8 py-3 text-lg font-bold text-white transition-colors hover:bg-[#024a8a] active:bg-[#013d73] disabled:opacity-50"
-        data-testid="submit-button"
-      >
-        Create My Card
-      </button>
+      <div className="mt-2 flex w-full flex-col gap-3">
+        <button
+          type="submit"
+          disabled={!isValid}
+          className="min-h-[48px] w-full rounded-full bg-[#035ba7] px-8 py-3 text-lg font-bold text-white transition-colors hover:bg-[#024a8a] active:bg-[#013d73] disabled:opacity-50"
+          data-testid="submit-button"
+        >
+          Create My Card
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            log.info('User tapped Back from text entry');
+            setStep('photo-capture');
+          }}
+          className="min-h-[48px] w-full rounded-full border border-foreground/20 px-8 py-3 text-lg font-semibold text-foreground/70 transition-colors hover:bg-foreground/5 active:bg-foreground/10"
+          data-testid="back-button"
+        >
+          Back
+        </button>
+      </div>
     </form>
   );
 }

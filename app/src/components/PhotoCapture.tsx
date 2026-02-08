@@ -37,6 +37,10 @@ export function PhotoCapture() {
         blobSizeKB: Math.round(photo.blob.size / 1024),
       });
       setCroppedPhoto(photo);
+
+      // TODO: Re-enable stylization when OpenAI billing is resolved
+      // stylizePhoto(photo.blob) — see stylize-client.ts
+
       setStep('text-entry');
     },
     [setCroppedPhoto, setStep],

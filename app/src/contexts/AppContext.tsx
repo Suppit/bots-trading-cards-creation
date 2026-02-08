@@ -36,6 +36,8 @@ export interface CardFormData {
   proTip: string;
 }
 
+export type StylizationStatus = 'idle' | 'processing' | 'complete' | 'failed';
+
 interface AppState {
   step: AppStep;
   setStep: (step: AppStep) => void;
@@ -48,6 +50,12 @@ interface AppState {
   setCroppedPhoto: (photo: PhotoData | null) => void;
   formData: CardFormData | null;
   setFormData: (data: CardFormData | null) => void;
+  stylizedPhoto: Blob | null;
+  setStylizedPhoto: (photo: Blob | null) => void;
+  stylizationStatus: StylizationStatus;
+  setStylizationStatus: (status: StylizationStatus) => void;
+  stylizationError: string | null;
+  setStylizationError: (error: string | null) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -75,6 +83,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [preloadError, setPreloadError] = useState<string | null>(null);
   const [croppedPhoto, setCroppedPhoto] = useState<PhotoData | null>(null);
   const [formData, setFormData] = useState<CardFormData | null>(null);
+  const [stylizedPhoto, setStylizedPhoto] = useState<Blob | null>(null);
+  const [stylizationStatus, setStylizationStatus] = useState<StylizationStatus>('idle');
+  const [stylizationError, setStylizationError] = useState<string | null>(null);
   const hasStartedRef = useRef(false);
 
   const runPreload = useCallback(async () => {
@@ -123,6 +134,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setCroppedPhoto,
         formData,
         setFormData,
+        stylizedPhoto,
+        setStylizedPhoto,
+        stylizationStatus,
+        setStylizationStatus,
+        stylizationError,
+        setStylizationError,
       }}
     >
       {children}

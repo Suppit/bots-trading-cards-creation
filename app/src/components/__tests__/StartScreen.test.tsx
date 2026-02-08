@@ -21,6 +21,12 @@ let mockContextValue = {
   setCroppedPhoto: mockSetCroppedPhoto,
   formData: null,
   setFormData: mockSetFormData,
+  stylizedPhoto: null,
+  setStylizedPhoto: vi.fn(),
+  stylizationStatus: 'idle' as const,
+  setStylizationStatus: vi.fn(),
+  stylizationError: null,
+  setStylizationError: vi.fn(),
 };
 
 vi.mock('@/contexts/AppContext', () => ({
@@ -55,6 +61,12 @@ describe('StartScreen', () => {
       setCroppedPhoto: mockSetCroppedPhoto,
       formData: null,
       setFormData: mockSetFormData,
+      stylizedPhoto: null,
+      setStylizedPhoto: vi.fn(),
+      stylizationStatus: 'idle' as const,
+      setStylizationStatus: vi.fn(),
+      stylizationError: null,
+      setStylizationError: vi.fn(),
     };
   });
 

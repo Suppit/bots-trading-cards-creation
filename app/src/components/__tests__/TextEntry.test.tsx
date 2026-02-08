@@ -19,6 +19,12 @@ vi.mock('@/contexts/AppContext', () => ({
     retryPreload: vi.fn(),
     croppedPhoto: null,
     setCroppedPhoto: vi.fn(),
+    stylizedPhoto: null,
+    setStylizedPhoto: vi.fn(),
+    stylizationStatus: 'idle' as const,
+    setStylizationStatus: vi.fn(),
+    stylizationError: null,
+    setStylizationError: vi.fn(),
   }),
 }));
 

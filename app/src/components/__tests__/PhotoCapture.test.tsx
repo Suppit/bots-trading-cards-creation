@@ -19,6 +19,12 @@ vi.mock('@/contexts/AppContext', () => ({
     retryPreload: vi.fn(),
     formData: null,
     setFormData: vi.fn(),
+    stylizedPhoto: null,
+    setStylizedPhoto: vi.fn(),
+    stylizationStatus: 'idle' as const,
+    setStylizationStatus: vi.fn(),
+    stylizationError: null,
+    setStylizationError: vi.fn(),
   }),
 }));
 
@@ -29,6 +35,10 @@ vi.mock('@/lib/logger', () => ({
     warn: vi.fn(),
     error: vi.fn(),
   }),
+}));
+
+vi.mock('@/lib/stylize-client', () => ({
+  stylizePhoto: vi.fn().mockResolvedValue(new Blob(['styled'], { type: 'image/jpeg' })),
 }));
 
 // Mock child components to test orchestration
