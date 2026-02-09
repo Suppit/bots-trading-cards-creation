@@ -6,6 +6,7 @@ import { WizardStepper } from './WizardStepper';
 import { StartScreen } from './StartScreen';
 import { PhotoCapture } from './PhotoCapture';
 import { TextEntry } from './TextEntry';
+import { CardReveal } from './CardReveal';
 import { PlaceholderScreen } from './PlaceholderScreen';
 import { createLogger } from '@/lib/logger';
 
@@ -30,6 +31,8 @@ export function AppFlow() {
         return <PhotoCapture />;
       case 'text-entry':
         return <TextEntry />;
+      case 'card-reveal':
+        return <CardReveal />;
       default:
         return <PlaceholderScreen step={step} />;
     }

@@ -76,7 +76,7 @@ export const FONTS = {
 export const TEXT_ZONES = {
   title: {
     x: 85,
-    y: 75,
+    y: 115,
     maxWidth: 700,
     fontSize: 80,
     fontWeight: '700' as const,
@@ -87,21 +87,28 @@ export const TEXT_ZONES = {
 
   tagline: {
     x: 97,
-    y: 1305,
+    y: 1430,
     maxWidth: 1000,
-    fontSize: 44,
+    fontSize: 53,
     fontWeight: '700' as const,
     fontStyle: 'normal' as const,
     color: '#1A1A1A',
     smallCaps: true,
-    // Tagline sits in the ribbon area just below the portrait
+    bar: {
+      path: '/Tagline-Bar.png',
+      x: 58,                          // left clip edge (shifted 3px right)
+      padding: 80,                    // bar extends 80px past the text
+      maxRight: 1402,                 // right edge of portrait frame (97 + 1305)
+      height: 126,                    // native bar image height
+    },
+    // Tagline sits centered in the ribbon area just below the portrait
   },
 
   funFact: {
     x: 97,
-    y: 1420,
+    y: 1630,
     maxWidth: 1305,
-    fontSize: 44,
+    fontSize: 53,
     labelFontWeight: '700' as const,
     bodyFontWeight: '400' as const,
     fontStyle: 'normal' as const,
@@ -113,9 +120,9 @@ export const TEXT_ZONES = {
 
   proTip: {
     x: 97,
-    y: 1620,
+    y: 1840,
     maxWidth: 1305,
-    fontSize: 44,
+    fontSize: 53,
     labelFontWeight: '700' as const,
     bodyFontWeight: '400' as const,
     fontStyle: 'normal' as const,
