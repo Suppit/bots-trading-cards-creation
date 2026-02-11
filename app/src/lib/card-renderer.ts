@@ -54,11 +54,38 @@ export async function renderCard(
   ctx.drawImage(input.frame, 0, 0, CARD_WIDTH, CARD_HEIGHT);
   log.info('Layer rendered: frame');
 
-  // 3. Title — white, bold italic on the black diagonal banner
+  // 3. Title banner — black diagonal background (short or long based on rendered text width)
   const tz = TEXT_ZONES.title;
+  const titleBanner = tz.banner;
   ctx.font = `${tz.fontStyle} ${tz.fontWeight} ${tz.fontSize}px Aileron`;
-  ctx.fillStyle = tz.color;
+  const titleTextWidth = ctx.measureText(input.formData.title).width;
+  const titleRightEdge = tz.x + titleTextWidth;
+  const bannerPath =
+    titleRightEdge > titleBanner.widthThreshold
+      ? titleBanner.longPath
+      : titleBanner.shortPath;
+  const bannerImg = await loadUrlImage(bannerPath);
+  ctx.drawImage(bannerImg, titleBanner.x, titleBanner.y);
+  log.info('Layer rendered: title banner', { variant: bannerPath, titleRightEdge: Math.round(titleRightEdge) });
+
+  // 4. Title text — rainbow gradient fill + blue offset stroke
+  ctx.font = `${tz.fontStyle} ${tz.fontWeight} ${tz.fontSize}px Aileron`;
   ctx.textBaseline = 'top';
+
+  // Blue offset stroke (drawn first, behind the fill)
+  ctx.strokeStyle = '#363795';
+  ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+  ctx.strokeText(input.formData.title, tz.x + 2, tz.y + 2, tz.maxWidth);
+
+  // Rainbow gradient fill (top to bottom across the text)
+  const titleGradient = ctx.createLinearGradient(0, tz.y, 0, tz.y + tz.fontSize);
+  titleGradient.addColorStop(0, '#fbd8e7');
+  titleGradient.addColorStop(0.25, '#dbcee6');
+  titleGradient.addColorStop(0.5, '#fefbdf');
+  titleGradient.addColorStop(0.75, '#c2cae7');
+  titleGradient.addColorStop(1, '#fdd5c5');
+  ctx.fillStyle = titleGradient;
   ctx.fillText(input.formData.title, tz.x, tz.y, tz.maxWidth);
   log.info('Layer rendered: title');
 

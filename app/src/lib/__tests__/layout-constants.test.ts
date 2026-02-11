@@ -16,11 +16,11 @@ describe('layout-constants', () => {
     expect(CARD_HEIGHT).toBe(2098);
   });
 
-  it('portrait aspect ratio matches 114:97', () => {
-    expect(PORTRAIT_ASPECT_RATIO).toBeCloseTo(114 / 97, 4);
+  it('portrait aspect ratio matches actual frame window (1231:1043)', () => {
+    expect(PORTRAIT_ASPECT_RATIO).toBeCloseTo(1231 / 1043, 4);
   });
 
-  it('portrait dimensions respect the 114:97 aspect ratio', () => {
+  it('portrait dimensions respect the frame window aspect ratio', () => {
     const actualRatio = PORTRAIT.width / PORTRAIT.height;
     expect(actualRatio).toBeCloseTo(PORTRAIT_ASPECT_RATIO, 1);
   });

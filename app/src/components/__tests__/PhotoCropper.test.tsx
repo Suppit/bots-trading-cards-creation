@@ -13,7 +13,7 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 vi.mock('@/lib/layout-constants', () => ({
-  PORTRAIT_ASPECT_RATIO: 114 / 97,
+  PORTRAIT_ASPECT_RATIO: 1231 / 1043,
 }));
 
 vi.mock('@/hooks/useImageCrop', () => ({

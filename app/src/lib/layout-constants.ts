@@ -19,14 +19,14 @@ export const CARD_HEIGHT = 2098;
 // Portrait window (where the stylized photo is drawn behind the frame)
 // ---------------------------------------------------------------------------
 
-/** Aspect ratio of the portrait mask (width : height = 114 : 97). */
-export const PORTRAIT_ASPECT_RATIO = 114 / 97;
+/** Aspect ratio of the portrait mask, derived from actual frame window (1231×1043). */
+export const PORTRAIT_ASPECT_RATIO = 1231 / 1043;
 
 export const PORTRAIT = {
-  x: 97,
-  y: 158,
-  width: 1305,
-  height: 1111, // 1305 * (97/114) ≈ 1111
+  x: 135,
+  y: 257,
+  width: 1231,
+  height: 1043,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -82,12 +82,18 @@ export const TEXT_ZONES = {
     fontWeight: '700' as const,
     fontStyle: 'italic' as const,
     color: '#FFFFFF',
-    // Title sits on the black diagonal banner at the top of the card
+    banner: {
+      shortPath: '/title-short.png',
+      longPath: '/title-long.png',
+      widthThreshold: 750, // use long banner if text right edge exceeds this x
+      x: 56,
+      y: 56,
+    },
   },
 
   tagline: {
     x: 97,
-    y: 1430,
+    y: 1420,
     maxWidth: 1000,
     fontSize: 53,
     fontWeight: '700' as const,
