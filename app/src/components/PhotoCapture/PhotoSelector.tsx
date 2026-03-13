@@ -243,6 +243,10 @@ export function PhotoSelector({ onPhotoSelected, onBack }: PhotoSelectorProps) {
             />
           </div>
 
+          <p className="text-xs text-foreground/40" data-testid="ai-disclaimer">
+            Photos are processed by AI. No photos are stored or shared.
+          </p>
+
           <button
             onClick={capturePhoto}
             disabled={loading}

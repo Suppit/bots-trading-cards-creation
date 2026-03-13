@@ -68,9 +68,6 @@ export function PhotoCapture() {
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6">
-      <div className="mb-4 w-full max-w-md rounded-lg bg-foreground/5 px-4 py-2 text-center text-xs text-foreground/50">
-        Photos are processed by AI. No photos are stored or shared.
-      </div>
       {subStep === 'select' && (
         <PhotoSelector
           onPhotoSelected={handlePhotoSelected}

@@ -94,6 +94,13 @@ describe('PhotoSelector', () => {
     expect(screen.getByText(/Camera is not available/)).toBeDefined();
   });
 
+  it('shows AI disclaimer between camera preview and capture button', async () => {
+    await act(async () => {
+      render(<PhotoSelector onPhotoSelected={vi.fn()} />);
+    });
+    expect(screen.getByTestId('ai-disclaimer')).toBeDefined();
+  });
+
   it('renders a back button when onBack prop is provided', async () => {
     const onBack = vi.fn();
     await act(async () => {
