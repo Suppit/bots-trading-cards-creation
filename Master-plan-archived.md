@@ -1,6 +1,4 @@
-# BOTS Trading Card Creator - Implementation Plan V2
-
-> This is the active implementation plan. The original plan is archived at `Master-plan-archived.md`.
+# BOTS Trading Card Creator - Implementation Plan
 
 ## Tech Stack Recommendation
 - **Frontend:** React/Next.js (mobile-first PWA)
@@ -10,7 +8,7 @@
 
 ---
 
-## Phase 1: Project Setup & Foundation ✅
+## Phase 1: Project Setup & Foundation
 
 ### 1.1 Initialize Project
 - Set up Next.js project with TypeScript
@@ -32,7 +30,7 @@
 
 ---
 
-## Phase 2: Asset Preparation & Preloading ✅
+## Phase 2: Asset Preparation & Preloading
 
 ### 2.1 Prepare Card Frame Assets
 - Create/obtain 5 card frame images (Series 1-4 + Specialty)
@@ -54,21 +52,12 @@
 
 ---
 
-## Phase 3: Start Screen (Entry Point) ✅ — AMENDED
+## Phase 3: Start Screen (Entry Point)
 
 ### 3.1 Build Start Screen Component
 - Full-screen mobile layout
 - "Start" button as primary CTA
 - Preload status indicator (subtle)
-
-### 3.2 Onboarding Content (integrated into Start Screen)
-- Add animated explainer section demonstrating the app flow
-  - Assets will be provided by stakeholder as GIFs or Lottie files
-  - Integrate via `<img>` for GIF or `lottie-react` package for Lottie
-  - Reserve layout slot for 1–3 animation files
-- Disclaimer text displayed below the animation (before the Start button):
-  > *"By continuing, you acknowledge that BOTS is not responsible for photos uploaded to AI processing. No photos are stored or shared by BOTS."*
-- Disclaimer should be legible but visually secondary (small text, muted color)
 
 **Testing Checkpoint:**
 ```
@@ -76,25 +65,18 @@
 - Log "[INFO] User tapped Start" on button press
 - Verify touch targets are 44px+ for mobile
 - Test on iOS Safari and Chrome Android
-- Verify Lottie/GIF loads and loops correctly
-- Verify disclaimer is visible without scrolling on common screen sizes
 ```
 
 ---
 
-## Phase 4: Photo Capture & Crop — AMENDED
+## Phase 4: Photo Capture & Crop
 
 ### 4.1 Camera/Gallery Access
 - Implement file input with `capture="user"` for selfie
 - Fallback to gallery selection
 - Handle permission denied gracefully
 
-### 4.2 Inline Disclaimer Reminder
-- Display a brief, non-blocking notice at the top of the photo capture screen:
-  > *"Photos are processed by AI. No photos are stored or shared."*
-- Style as a small info banner (not a modal or gate)
-
-### 4.3 Crop Interface (114:97 Aspect Ratio)
+### 4.2 Crop Interface (114:97 Aspect Ratio)
 - Use library like `react-image-crop` or custom Canvas implementation
 - Lock aspect ratio to 114:97
 - Pan/zoom gestures for mobile
@@ -108,12 +90,11 @@
 - Log "[ERROR] ..." for any image load failures
 - Test with various image sizes (tiny, huge, portrait, landscape)
 - Verify crop preview matches final output
-- Verify disclaimer banner is visible and unobtrusive
 ```
 
 ---
 
-## Phase 5: Image Stylization Service ✅ (infrastructure complete, disabled pending OpenAI billing)
+## Phase 5: Image Stylization Service
 
 ### 5.1 Backend API Setup
 - Create `/api/stylize` endpoint
@@ -139,45 +120,32 @@
 
 ---
 
-## Phase 6: Text Entry Form — AMENDED
+## Phase 6: Text Entry Form
 
 ### 6.1 Build Form Component
-- **Four fields:** Title, Tagline, Fun Fact, and one user-selected bottom field (see 6.2)
+- Four fields: Title, Tagline, Fun Fact, Pro Tip
 - Character limit validation with counters
 - Required field indicators
 - Keyboard-friendly mobile UX
 
-### 6.2 Bottom Field Selector ("Pro Tip" becomes a choice)
-- Replace the fixed "Pro Tip" label with a **4-option selector** the user picks before typing:
-  1. Pro Tip
-  2. Favorite Food
-  3. Favorite Color
-  4. What You Don't Know About Me
-- The selected option becomes the label rendered on the card
-- UI interaction design TBD — stakeholder will provide a Figma design for this interaction; implement to match that spec
-- Only one option can be selected at a time; selecting a new option clears the text field
-- The selected label is stored in app state alongside the field text
-
-### 6.3 Validation Logic
+### 6.2 Validation Logic
 - Real-time character counting
-- Prevent submission until all fields are valid and a bottom field option is selected
+- Prevent submission until valid
 - Show stylization progress indicator
 
 **Testing Checkpoint:**
 ```
 - Log "[INFO] Form field changed: {field}, length: {n}/{max}"
-- Log "[INFO] Bottom field option selected: {option}"
 - Log "[WARN] Validation failed: {field} - {reason}"
 - Log "[INFO] Form submitted successfully"
 - Test with emoji input, special characters
 - Test paste of long text
-- Test switching between options clears text field
 - Verify form doesn't jump on keyboard open (mobile)
 ```
 
 ---
 
-## Phase 7: Card Reveal & Rendering ✅
+## Phase 7: Card Reveal & Rendering
 
 ### 7.1 Card Composer Component
 - Canvas-based rendering
@@ -188,10 +156,6 @@
 - Wait for both stylization + form completion
 - Animate card appearance (fade/scale)
 
-### 7.3 Dynamic Bottom Field Label
-- The canvas renderer uses the user's selected bottom field label (from Phase 6.2) instead of a hardcoded "Pro Tip:" string
-- All other text zones remain unchanged
-
 **Testing Checkpoint:**
 ```
 - Log "[INFO] Card composition started"
@@ -201,39 +165,28 @@
 - Visual QA: text positioning, portrait mask alignment
 - Test with longest possible text entries
 - Test with minimum text entries
-- Verify correct label renders for each of the 4 bottom field options
 ```
 
 ---
 
-## Phase 8: Series Navigation — AMENDED
+## Phase 8: Series Swipe
 
-### 8.1 Overview
-Series navigation lives **on the Card Reveal page** — not a separate screen. The card defaults to the **Specialty (rainbow) frame** on reveal. Users can browse all 5 series without leaving the page.
+### 8.1 Swipe Gesture Handler
+- Implement horizontal swipe detection
+- Preload adjacent frames for smooth transitions
+- Dot indicators for current series
 
-### 8.2 Navigation Controls
-- **Swipe right** or **right arrow button**: advances forward through series
-- **Swipe left** or **left arrow button**: goes backward through series
-- Series order (left → right): Specialty → Series 1 → Series 2 → Series 3 → Series 4
-  - Swiping right from Series 4 wraps back to Specialty
-  - Swiping left from Specialty wraps to Series 4
-- Arrow buttons always visible; swipe gesture supported on touch devices
-- Dot/pip indicator showing current position in the 5-frame sequence
-
-### 8.3 Frame Swap Logic
-- Default frame on card reveal: **Specialty**
-- Only the frame layer swaps; portrait and text are not reprocessed
-- Instant re-render on navigation (target <16ms)
+### 8.2 Frame Swap Logic
+- Only swap frame layer, keep portrait + text
+- Instant re-render on swipe
 
 **Testing Checkpoint:**
 ```
 - Log "[INFO] Series changed: {from} → {to}"
 - Log render time for frame swap (should be <16ms for 60fps)
-- Test rapid swiping in both directions
-- Test wrap-around at both ends (Specialty ↔ Series 4)
-- Verify default loads as Specialty on card reveal
-- Verify no image reprocessing occurs on frame swap
-- Test arrow buttons on desktop; test swipe on mobile
+- Test rapid swiping
+- Test swipe at edges (first/last series)
+- Verify no image reprocessing occurs
 ```
 
 ---
@@ -304,42 +257,6 @@ Series navigation lives **on the Card Reveal page** — not a separate screen. T
 
 ---
 
-## Phase 12: Deployment
-
-> Note: Most DNS/hosting steps are performed by the stakeholder. Instructions below are provided for reference.
-
-### 12.1 Vercel Deployment
-- Deploy the `app/` Next.js project to Vercel (target: free tier)
-- Set all required environment variables in Vercel dashboard (e.g., `OPENAI_API_KEY`, `NEXT_PUBLIC_LOG_LEVEL`)
-- Confirm free tier supports: Next.js API routes, image uploads, build size
-
-### 12.2 Custom Subdomain via CNAME
-- Target URL: `cards.bringonthespectrum.org` (or similar)
-- Steps for stakeholder:
-  1. Identify DNS provider for `bringonthespectrum.org`
-  2. Add a `CNAME` record: `cards` → `cname.vercel-dns.com` (Vercel's CNAME target)
-  3. In Vercel project settings → Domains → add `cards.bringonthespectrum.org`
-  4. Vercel will auto-provision SSL (Let's Encrypt)
-- No domain purchase needed — this runs under the existing domain
-
-### 12.3 Post-Deploy Smoke Test
-- Open on iOS Safari and Chrome Android
-- Run through full user flow: Start → Photo → Text → Card → Export
-- Check console for errors
-- Verify share/download works on mobile
-
----
-
-## Global Implementation Note: Back Button
-
-**Every screen except the Start Screen must include a back button.**
-- Positioned consistently (top-left, 44px+ touch target)
-- Tapping back navigates to the previous step in the app flow
-- Back button should be present on: Photo Capture, Text Entry, Card Reveal, Export
-- Log `[INFO] Action: Back tapped from {screenName}` on press
-
----
-
 ## Logging Summary Table
 
 | Event | Level | Example Output |
@@ -357,13 +274,11 @@ Series navigation lives **on the Card Reveal page** — not a separate screen. T
 
 ## Suggested Build Order
 
-1. Phases 1-2 (Foundation + Assets) ✅
-2. Phase 3 (Start Screen + Onboarding content) ✅ — *animation assets pending from stakeholder*
-3. Phase 4 (Photo Capture + disclaimer banner) → **First testable flow**
-4. Phase 6 (Text Entry + bottom field selector) → *UI spec pending Figma from stakeholder*
-5. Phase 5 (Stylization) → **Integrate API**
-6. Phase 7 (Card Reveal + dynamic label) → **Core feature complete**
-7. Phase 8 (Series Navigation on Card Reveal page) → **Full card experience**
-8. Phase 9 (Export) → **MVP complete**
-9. Phases 10-11 (Polish)
-10. Phase 12 (Deployment)
+1. Phases 1-2 (Foundation + Assets)
+2. Phases 3-4 (Start + Photo) → **First testable flow**
+3. Phase 6 (Text Entry) → **Can test form in isolation**
+4. Phase 5 (Stylization) → **Integrate API**
+5. Phase 7 (Card Reveal) → **Core feature complete**
+6. Phase 8 (Series Swipe) → **Full card experience**
+7. Phase 9 (Export) → **MVP complete**
+8. Phases 10-11 (Polish)

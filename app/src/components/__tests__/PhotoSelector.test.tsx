@@ -94,6 +94,24 @@ describe('PhotoSelector', () => {
     expect(screen.getByText(/Camera is not available/)).toBeDefined();
   });
 
+  it('renders a back button when onBack prop is provided', async () => {
+    const onBack = vi.fn();
+    await act(async () => {
+      render(<PhotoSelector onPhotoSelected={vi.fn()} onBack={onBack} />);
+    });
+    const backBtn = screen.getByTestId('back-to-start');
+    expect(backBtn).toBeDefined();
+    await act(async () => { backBtn.click(); });
+    expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  it('does not render a back button when onBack prop is omitted', async () => {
+    await act(async () => {
+      render(<PhotoSelector onPhotoSelected={vi.fn()} />);
+    });
+    expect(screen.queryByTestId('back-to-start')).toBeNull();
+  });
+
   it('has a hidden gallery file input', async () => {
     await act(async () => {
       render(<PhotoSelector onPhotoSelected={vi.fn()} />);

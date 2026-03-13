@@ -5,6 +5,7 @@ import { useAppContext } from '@/contexts/AppContext';
 import type { PhotoData } from '@/contexts/AppContext';
 import { PhotoSelector } from './PhotoCapture/PhotoSelector';
 import { PhotoCropper } from './PhotoCapture/PhotoCropper';
+import { stylizePhoto } from '@/lib/stylize-client';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('PhotoCapture');
@@ -12,7 +13,7 @@ const log = createLogger('PhotoCapture');
 type SubStep = 'select' | 'crop';
 
 export function PhotoCapture() {
-  const { setCroppedPhoto, setStep } = useAppContext();
+  const { setCroppedPhoto, setStep, setStylizedPhoto, setStylizationStatus, setStylizationError } = useAppContext();
   const [subStep, setSubStep] = useState<SubStep>('select');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -38,12 +39,25 @@ export function PhotoCapture() {
       });
       setCroppedPhoto(photo);
 
-      // TODO: Re-enable stylization when OpenAI billing is resolved
-      // stylizePhoto(photo.blob) — see stylize-client.ts
+      // Fire stylization in the background while user fills out text entry
+      setStylizationStatus('processing');
+      setStylizationError(null);
+      stylizePhoto(photo.blob)
+        .then((stylizedBlob) => {
+          setStylizedPhoto(stylizedBlob);
+          setStylizationStatus('complete');
+          log.info('Stylization complete in background');
+        })
+        .catch((err) => {
+          const message = err instanceof Error ? err.message : String(err);
+          setStylizationStatus('failed');
+          setStylizationError(message);
+          log.error('Stylization failed, will use original photo', { error: message });
+        });
 
       setStep('text-entry');
     },
-    [setCroppedPhoto, setStep],
+    [setCroppedPhoto, setStep, setStylizedPhoto, setStylizationStatus, setStylizationError],
   );
 
   const handleBackToSelector = useCallback(() => {
@@ -54,8 +68,17 @@ export function PhotoCapture() {
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6">
+      <div className="mb-4 w-full max-w-md rounded-lg bg-foreground/5 px-4 py-2 text-center text-xs text-foreground/50">
+        Photos are processed by AI. No photos are stored or shared.
+      </div>
       {subStep === 'select' && (
-        <PhotoSelector onPhotoSelected={handlePhotoSelected} />
+        <PhotoSelector
+          onPhotoSelected={handlePhotoSelected}
+          onBack={() => {
+            log.info('User tapped Back from photo-capture to start');
+            setStep('start');
+          }}
+        />
       )}
       {subStep === 'crop' && selectedFile && (
         <PhotoCropper

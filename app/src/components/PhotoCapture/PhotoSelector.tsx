@@ -15,9 +15,10 @@ type CameraState = 'requesting' | 'active' | 'denied' | 'unavailable';
 
 interface PhotoSelectorProps {
   onPhotoSelected: (file: File) => void;
+  onBack?: () => void;
 }
 
-export function PhotoSelector({ onPhotoSelected }: PhotoSelectorProps) {
+export function PhotoSelector({ onPhotoSelected, onBack }: PhotoSelectorProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -193,6 +194,17 @@ export function PhotoSelector({ onPhotoSelected }: PhotoSelectorProps) {
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
+      {onBack && (
+        <div className="flex w-full max-w-md">
+          <button
+            onClick={onBack}
+            className="flex min-h-[44px] items-center gap-1 text-sm font-semibold text-[#035ba7]"
+            data-testid="back-to-start"
+          >
+            ← Back
+          </button>
+        </div>
+      )}
       <h2 className="text-xl font-bold">Take a selfie</h2>
 
       {/* Hidden canvas for capture */}

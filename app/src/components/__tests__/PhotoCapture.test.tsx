@@ -43,8 +43,9 @@ vi.mock('@/lib/stylize-client', () => ({
 
 // Mock child components to test orchestration
 vi.mock('../PhotoCapture/PhotoSelector', () => ({
-  PhotoSelector: ({ onPhotoSelected }: { onPhotoSelected: (f: File) => void }) => (
+  PhotoSelector: ({ onPhotoSelected, onBack }: { onPhotoSelected: (f: File) => void; onBack?: () => void }) => (
     <div data-testid="photo-selector">
+      {onBack && <button onClick={onBack}>Mock Back to Start</button>}
       <button
         onClick={() => {
           const blob = new Blob(['test'], { type: 'image/jpeg' });
@@ -90,6 +91,14 @@ describe('PhotoCapture', () => {
 
     expect(screen.getByTestId('photo-cropper')).toBeDefined();
     expect(screen.queryByTestId('photo-selector')).toBeNull();
+  });
+
+  it('navigates back to start when back is clicked from photo selector', async () => {
+    render(<PhotoCapture />);
+    await act(() => {
+      screen.getByRole('button', { name: 'Mock Back to Start' }).click();
+    });
+    expect(mockSetStep).toHaveBeenCalledWith('start');
   });
 
   it('transitions back to select when back is clicked from crop', async () => {
