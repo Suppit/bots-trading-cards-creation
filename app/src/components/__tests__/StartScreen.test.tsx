@@ -27,6 +27,8 @@ let mockContextValue = {
   setStylizationStatus: vi.fn(),
   stylizationError: null,
   setStylizationError: vi.fn(),
+    cardDataUrl: null,
+    setCardDataUrl: vi.fn(),
 };
 
 vi.mock('@/contexts/AppContext', () => ({
@@ -67,6 +69,8 @@ describe('StartScreen', () => {
       setStylizationStatus: vi.fn(),
       stylizationError: null,
       setStylizationError: vi.fn(),
+    cardDataUrl: null,
+    setCardDataUrl: vi.fn(),
     };
   });
 

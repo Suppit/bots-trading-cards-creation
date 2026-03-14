@@ -25,6 +25,8 @@ vi.mock('@/contexts/AppContext', () => ({
     setStylizationStatus: vi.fn(),
     stylizationError: null,
     setStylizationError: vi.fn(),
+    cardDataUrl: null,
+    setCardDataUrl: vi.fn(),
   }),
 }));
 

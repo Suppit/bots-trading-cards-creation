@@ -57,6 +57,8 @@ interface AppState {
   setStylizationStatus: (status: StylizationStatus) => void;
   stylizationError: string | null;
   setStylizationError: (error: string | null) => void;
+  cardDataUrl: string | null;
+  setCardDataUrl: (url: string | null) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -87,6 +89,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [stylizedPhoto, setStylizedPhoto] = useState<Blob | null>(null);
   const [stylizationStatus, setStylizationStatus] = useState<StylizationStatus>('idle');
   const [stylizationError, setStylizationError] = useState<string | null>(null);
+  const [cardDataUrl, setCardDataUrl] = useState<string | null>(null);
   const hasStartedRef = useRef(false);
 
   const runPreload = useCallback(async () => {
@@ -141,6 +144,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setStylizationStatus,
         stylizationError,
         setStylizationError,
+        cardDataUrl,
+        setCardDataUrl,
       }}
     >
       {children}

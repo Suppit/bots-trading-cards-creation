@@ -38,6 +38,8 @@ vi.mock('@/contexts/AppContext', () => ({
         ['series-4', mockFrame],
       ]),
     },
+    cardDataUrl: null,
+    setCardDataUrl: vi.fn(),
   }),
 }));
 

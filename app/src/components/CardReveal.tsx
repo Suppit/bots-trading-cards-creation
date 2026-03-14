@@ -21,11 +21,11 @@ const SERIES_ORDER: SeriesId[] = [
 ];
 
 export function CardReveal() {
-  const { croppedPhoto, stylizedPhoto, formData, preloadResult, setStep } =
+  const { croppedPhoto, stylizedPhoto, formData, preloadResult, setStep, setCardDataUrl } =
     useAppContext();
 
   const [renderState, setRenderState] = useState<RenderState>('loading');
-  const [cardDataUrl, setCardDataUrl] = useState<string | null>(null);
+  const [localCardDataUrl, setLocalCardDataUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [seriesIndex, setSeriesIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
@@ -54,7 +54,7 @@ export function CardReveal() {
     try {
       const canvas = await renderCard({ frame, portrait, formData });
       const dataUrl = canvas.toDataURL('image/png');
-      setCardDataUrl(dataUrl);
+      setLocalCardDataUrl(dataUrl);
       setRenderState('ready');
       log.info('Card rendered and displayed', { series: currentSeriesId });
     } catch (err) {
@@ -139,7 +139,7 @@ export function CardReveal() {
         </div>
       )}
 
-      {renderState === 'ready' && cardDataUrl && (
+      {renderState === 'ready' && localCardDataUrl && (
         <div className="flex w-full max-w-md flex-col items-center gap-5 animate-in fade-in duration-500">
           <h2 className="text-center text-xl font-bold">Your Card</h2>
 
@@ -150,7 +150,7 @@ export function CardReveal() {
             onTouchEnd={handleTouchEnd}
           >
             <img
-              src={cardDataUrl}
+              src={localCardDataUrl}
               alt={`Your BOTS trading card — ${currentSeriesLabel}`}
               className="w-full rounded-lg shadow-lg"
               style={{ aspectRatio: '1499 / 2098' }}
@@ -211,6 +211,7 @@ export function CardReveal() {
             <button
               onClick={() => {
                 log.info('User tapped Save Card from card reveal', { series: currentSeriesId });
+                if (localCardDataUrl) setCardDataUrl(localCardDataUrl);
                 setStep('export');
               }}
               className="min-h-[48px] w-full rounded-full bg-[#035ba7] px-8 py-3 text-lg font-bold text-white transition-colors hover:bg-[#024a8a] active:bg-[#013d73]"
