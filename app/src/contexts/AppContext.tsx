@@ -34,6 +34,7 @@ export interface CardFormData {
   tagline: string;
   funFact: string;
   proTip: string;
+  proTipLabel: string; // user-selected label for the bottom field
 }
 
 export type StylizationStatus = 'idle' | 'processing' | 'complete' | 'failed';

@@ -130,8 +130,9 @@ export async function renderCard(
   drawLabeledField(ctx, TEXT_ZONES.funFact, input.formData.funFact);
   log.info('Layer rendered: funFact');
 
-  // 6. Pro Tip — bold label + regular body, word-wrapped
-  drawLabeledField(ctx, TEXT_ZONES.proTip, input.formData.proTip);
+  // 6. Bottom field — label driven by user's selection, bold label + regular body, word-wrapped
+  const proTipZone = { ...TEXT_ZONES.proTip, label: `${input.formData.proTipLabel}:` };
+  drawLabeledField(ctx, proTipZone, input.formData.proTip);
   log.info('Layer rendered: proTip');
 
   const totalRenderTimeMs = Math.round(performance.now() - startTime);

@@ -8,8 +8,32 @@ import { createLogger } from '@/lib/logger';
 
 const log = createLogger('TextEntry');
 
+// ---------------------------------------------------------------------------
+// Bottom field prompt cycling
+// ---------------------------------------------------------------------------
+
+const BOTTOM_FIELD_OPTIONS = [
+  'Pro Tip',
+  'Favorite Food',
+  'Favorite Color',
+  "What You Don't Know About Me",
+] as const;
+
+type BottomFieldOption = (typeof BOTTOM_FIELD_OPTIONS)[number];
+
+const BOTTOM_FIELD_PLACEHOLDERS: Record<BottomFieldOption, string> = {
+  'Pro Tip': 'e.g., "Start with the corners, always"',
+  'Favorite Food': 'e.g., "Pizza – I could eat it every day!"',
+  'Favorite Color': 'e.g., "Ocean blue or sunset orange"',
+  "What You Don't Know About Me": 'e.g., "I\'ve visited 12 countries"',
+};
+
+// ---------------------------------------------------------------------------
+// Fixed fields (title, tagline, fun fact)
+// ---------------------------------------------------------------------------
+
 interface FieldConfig {
-  key: 'title' | 'tagline' | 'funFact' | 'proTip';
+  key: 'title' | 'tagline' | 'funFact';
   label: string;
   type: 'input' | 'textarea';
   maxLength: number;
@@ -36,14 +60,7 @@ const FIELDS: FieldConfig[] = [
     label: 'Fun Fact',
     type: 'textarea',
     maxLength: CHAR_LIMITS.funFact,
-    placeholder: 'e.g., "Can solve a Rubik\'s cube in under 2 minutes"',
-  },
-  {
-    key: 'proTip',
-    label: 'Pro Tip',
-    type: 'textarea',
-    maxLength: CHAR_LIMITS.proTip,
-    placeholder: 'e.g., "Start with the corners, always"',
+    placeholder: "e.g., \"Can solve a Rubik's cube in under 2 minutes\"",
   },
 ];
 
@@ -64,11 +81,17 @@ export function TextEntry() {
   });
 
   const [profanityErrors, setProfanityErrors] = useState<Record<string, boolean>>({});
+  const [bottomFieldIndex, setBottomFieldIndex] = useState(0);
+  const [buttonPressed, setButtonPressed] = useState(false);
+  const [buttonHovered, setButtonHovered] = useState(false);
 
   log.info('Text entry screen mounted');
 
+  const currentBottomLabel = BOTTOM_FIELD_OPTIONS[bottomFieldIndex];
+  const currentPlaceholder = BOTTOM_FIELD_PLACEHOLDERS[currentBottomLabel];
+
   const handleChange = useCallback(
-    (key: FieldConfig['key'], value: string, maxLength: number) => {
+    (key: keyof typeof values, value: string, maxLength: number) => {
       const clamped = value.slice(0, maxLength);
       setValues((prev) => ({ ...prev, [key]: clamped }));
 
@@ -79,16 +102,27 @@ export function TextEntry() {
         log.warn('Profanity detected', { field: key });
       }
 
-      log.info(`Form field changed: ${key}`, {
-        length: clamped.length,
-        max: maxLength,
-      });
+      log.info(`Form field changed: ${key}`, { length: clamped.length, max: maxLength });
     },
     [],
   );
 
+  const handleCycleBottomField = useCallback(() => {
+    setBottomFieldIndex((prev) => {
+      const next = (prev + 1) % BOTTOM_FIELD_OPTIONS.length;
+      log.info('Bottom field option selected', { option: BOTTOM_FIELD_OPTIONS[next] });
+      return next;
+    });
+    // Clear the bottom field value when switching prompts
+    setValues((prev) => ({ ...prev, proTip: '' }));
+    setProfanityErrors((prev) => ({ ...prev, proTip: false }));
+  }, []);
+
   const hasProfanity = Object.values(profanityErrors).some(Boolean);
-  const isValid = FIELDS.every((f) => values[f.key].trim().length > 0) && !hasProfanity;
+  const isValid =
+    FIELDS.every((f) => values[f.key].trim().length > 0) &&
+    values.proTip.trim().length > 0 &&
+    !hasProfanity;
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -96,19 +130,21 @@ export function TextEntry() {
 
       for (const field of FIELDS) {
         if (values[field.key].trim().length === 0) {
-          log.warn('Validation failed', {
-            field: field.key,
-            reason: 'empty',
-          });
+          log.warn('Validation failed', { field: field.key, reason: 'empty' });
           return;
         }
         if (containsProfanity(values[field.key])) {
-          log.warn('Validation failed', {
-            field: field.key,
-            reason: 'inappropriate language',
-          });
+          log.warn('Validation failed', { field: field.key, reason: 'inappropriate language' });
           return;
         }
+      }
+      if (values.proTip.trim().length === 0) {
+        log.warn('Validation failed', { field: 'proTip', reason: 'empty' });
+        return;
+      }
+      if (containsProfanity(values.proTip)) {
+        log.warn('Validation failed', { field: 'proTip', reason: 'inappropriate language' });
+        return;
       }
 
       log.info('Form submitted successfully');
@@ -117,11 +153,19 @@ export function TextEntry() {
         tagline: values.tagline.trim(),
         funFact: values.funFact.trim(),
         proTip: values.proTip.trim(),
+        proTipLabel: currentBottomLabel,
       });
       setStep('card-reveal');
     },
-    [values, setFormData, setStep],
+    [values, currentBottomLabel, setFormData, setStep],
   );
+
+  // Button visual state classes
+  const buttonBg = buttonPressed
+    ? 'bg-[rgba(103,104,121,0.25)]'
+    : buttonHovered
+      ? 'bg-[rgba(103,104,121,0.18)]'
+      : 'bg-[rgba(103,104,121,0.1)]';
 
   return (
     <form
@@ -148,6 +192,7 @@ export function TextEntry() {
         </div>
       )}
 
+      {/* Fixed fields: Title, Tagline, Fun Fact */}
       {FIELDS.map((field) => {
         const value = values[field.key];
         const counterColor = getCounterColor(value.length, field.maxLength);
@@ -155,10 +200,7 @@ export function TextEntry() {
 
         return (
           <div key={field.key} className="flex w-full flex-col gap-1">
-            <label
-              htmlFor={field.key}
-              className="text-sm font-semibold text-foreground/70"
-            >
+            <label htmlFor={field.key} className="text-sm font-semibold text-foreground/70">
               {field.label} *
             </label>
 
@@ -168,9 +210,7 @@ export function TextEntry() {
                 type="text"
                 inputMode="text"
                 value={value}
-                onChange={(e) =>
-                  handleChange(field.key, e.target.value, field.maxLength)
-                }
+                onChange={(e) => handleChange(field.key, e.target.value, field.maxLength)}
                 placeholder={field.placeholder}
                 maxLength={field.maxLength}
                 className={`rounded-lg border bg-white px-3 py-2 text-base text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-1 ${
@@ -186,9 +226,7 @@ export function TextEntry() {
                 rows={2}
                 inputMode="text"
                 value={value}
-                onChange={(e) =>
-                  handleChange(field.key, e.target.value, field.maxLength)
-                }
+                onChange={(e) => handleChange(field.key, e.target.value, field.maxLength)}
                 placeholder={field.placeholder}
                 maxLength={field.maxLength}
                 className={`resize-none rounded-lg border bg-white px-3 py-2 text-base text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-1 ${
@@ -208,16 +246,72 @@ export function TextEntry() {
               ) : (
                 <span />
               )}
-              <span
-                className={`text-xs ${counterColor}`}
-                data-testid={`counter-${field.key}`}
-              >
+              <span className={`text-xs ${counterColor}`} data-testid={`counter-${field.key}`}>
                 {value.length}/{field.maxLength}
               </span>
             </div>
           </div>
         );
       })}
+
+      {/* Bottom field: cycling prompt */}
+      <div className="flex w-full flex-col gap-1">
+        {/* Label row with "Different prompt" button */}
+        <div className="flex items-center justify-between">
+          <label htmlFor="proTip" className="text-sm font-semibold text-foreground/70">
+            {currentBottomLabel} *
+          </label>
+
+          <button
+            type="button"
+            onClick={handleCycleBottomField}
+            onMouseEnter={() => setButtonHovered(true)}
+            onMouseLeave={() => { setButtonHovered(false); setButtonPressed(false); }}
+            onMouseDown={() => setButtonPressed(true)}
+            onMouseUp={() => setButtonPressed(false)}
+            className={`flex h-[24px] cursor-pointer items-center gap-1.5 rounded-[4px] px-2 transition-colors ${buttonBg}`}
+            data-testid="different-prompt-button"
+            aria-label="Cycle to different prompt"
+          >
+            <span className="text-[13px] font-normal text-foreground/30">Different prompt</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path d="M3.5 2L6.5 5L3.5 8" stroke="rgba(23,23,23,0.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <textarea
+          id="proTip"
+          rows={2}
+          inputMode="text"
+          value={values.proTip}
+          onChange={(e) => handleChange('proTip', e.target.value, CHAR_LIMITS.proTip)}
+          placeholder={currentPlaceholder}
+          maxLength={CHAR_LIMITS.proTip}
+          className={`resize-none rounded-lg border bg-white px-3 py-2 text-base text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-1 ${
+            profanityErrors.proTip
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+              : 'border-foreground/20 focus:border-[#035ba7] focus:ring-[#035ba7]'
+          }`}
+          data-testid="field-proTip"
+        />
+
+        <div className="flex items-center justify-between">
+          {profanityErrors.proTip ? (
+            <span className="text-xs text-red-500" role="alert" data-testid="profanity-proTip">
+              Please remove inappropriate language
+            </span>
+          ) : (
+            <span />
+          )}
+          <span
+            className={`text-xs ${getCounterColor(values.proTip.length, CHAR_LIMITS.proTip)}`}
+            data-testid="counter-proTip"
+          >
+            {values.proTip.length}/{CHAR_LIMITS.proTip}
+          </span>
+        </div>
+      </div>
 
       <div className="mt-2 flex w-full flex-col gap-3">
         <button

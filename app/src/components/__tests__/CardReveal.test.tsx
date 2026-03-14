@@ -10,6 +10,7 @@ const mockFormData = {
   tagline: 'Test Tagline',
   funFact: 'Test Fun Fact',
   proTip: 'Test Pro Tip',
+  proTipLabel: 'Pro Tip',
 };
 
 const mockFrame = {} as HTMLImageElement;

@@ -61,7 +61,7 @@ describe('TextEntry', () => {
     expect(screen.getByLabelText('Title *')).toBeDefined();
     expect(screen.getByLabelText('Tagline *')).toBeDefined();
     expect(screen.getByLabelText('Fun Fact *')).toBeDefined();
-    expect(screen.getByLabelText('Pro Tip *')).toBeDefined();
+    expect(screen.getByLabelText('Pro Tip *')).toBeDefined(); // default bottom field
   });
 
   it('renders the heading', () => {
@@ -140,6 +140,7 @@ describe('TextEntry', () => {
       tagline: 'My Tagline',
       funFact: 'My Fun Fact',
       proTip: 'My Pro Tip',
+      proTipLabel: 'Pro Tip',
     });
     expect(mockSetStep).toHaveBeenCalledWith('card-reveal');
   });
@@ -166,6 +167,7 @@ describe('TextEntry', () => {
       tagline: 'Tag',
       funFact: 'Fact',
       proTip: 'Tip',
+      proTipLabel: 'Pro Tip',
     });
   });
 
@@ -266,6 +268,52 @@ describe('TextEntry', () => {
     // Fix it
     fireEvent.change(titleInput, { target: { value: 'Good title' } });
     expect(screen.queryByTestId('profanity-title')).toBeNull();
+  });
+
+  // Different prompt button tests
+  it('renders the "Different prompt" button', () => {
+    render(<TextEntry />);
+    expect(screen.getByTestId('different-prompt-button')).toBeDefined();
+  });
+
+  it('cycles bottom field label: Pro Tip → Favorite Food on first click', () => {
+    render(<TextEntry />);
+    expect(screen.getByLabelText('Pro Tip *')).toBeDefined();
+    fireEvent.click(screen.getByTestId('different-prompt-button'));
+    expect(screen.getByLabelText('Favorite Food *')).toBeDefined();
+  });
+
+  it('cycles: Favorite Food → Favorite Color → What You Don\'t Know About Me → Pro Tip', () => {
+    render(<TextEntry />);
+    const btn = screen.getByTestId('different-prompt-button');
+    fireEvent.click(btn); // → Favorite Food
+    fireEvent.click(btn); // → Favorite Color
+    expect(screen.getByLabelText('Favorite Color *')).toBeDefined();
+    fireEvent.click(btn); // → What You Don't Know About Me
+    expect(screen.getByLabelText("What You Don't Know About Me *")).toBeDefined();
+    fireEvent.click(btn); // → wraps back to Pro Tip
+    expect(screen.getByLabelText('Pro Tip *')).toBeDefined();
+  });
+
+  it('clears the bottom field value when prompt is cycled', () => {
+    render(<TextEntry />);
+    fireEvent.change(screen.getByTestId('field-proTip'), { target: { value: 'some text' } });
+    expect((screen.getByTestId('field-proTip') as HTMLTextAreaElement).value).toBe('some text');
+    fireEvent.click(screen.getByTestId('different-prompt-button'));
+    expect((screen.getByTestId('field-proTip') as HTMLTextAreaElement).value).toBe('');
+  });
+
+  it('submits with selected proTipLabel after cycling', () => {
+    render(<TextEntry />);
+    fireEvent.click(screen.getByTestId('different-prompt-button')); // → Favorite Food
+    fireEvent.change(screen.getByTestId('field-title'), { target: { value: 'Title' } });
+    fireEvent.change(screen.getByTestId('field-tagline'), { target: { value: 'Tagline' } });
+    fireEvent.change(screen.getByTestId('field-funFact'), { target: { value: 'Fun fact' } });
+    fireEvent.change(screen.getByTestId('field-proTip'), { target: { value: 'Tacos' } });
+    fireEvent.submit(screen.getByTestId('text-entry-form'));
+    expect(mockSetFormData).toHaveBeenCalledWith(
+      expect.objectContaining({ proTipLabel: 'Favorite Food', proTip: 'Tacos' }),
+    );
   });
 
   it('does not submit form when profanity is present even via form submit', () => {
