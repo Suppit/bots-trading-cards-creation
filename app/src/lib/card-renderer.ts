@@ -198,6 +198,8 @@ function drawSmallCaps(
 interface LabeledZone {
   x: number;
   y: number;
+  boxTop?: number;
+  boxHeight?: number;
   maxWidth: number;
   fontSize: number;
   labelFontWeight: string;
@@ -212,7 +214,7 @@ function drawLabeledField(
   zone: LabeledZone,
   bodyText: string,
 ): void {
-  const { x, y, maxWidth, fontSize, color, lineHeight, label } = zone;
+  const { x, maxWidth, fontSize, color, lineHeight, label } = zone;
   const lineHeightPx = fontSize * lineHeight;
 
   ctx.fillStyle = color;
@@ -224,8 +226,18 @@ function drawLabeledField(
   // Wrap the combined text
   const lines = wrapText(ctx, fullText, maxWidth, fontSize, zone.labelFontWeight);
 
+  // Vertically center within the box if bounds are provided
+  const textHeight =
+    lines.length === 1
+      ? fontSize
+      : (lines.length - 1) * lineHeightPx + fontSize;
+  const startY =
+    zone.boxTop !== undefined && zone.boxHeight !== undefined
+      ? zone.boxTop + Math.max(0, Math.round((zone.boxHeight - textHeight) / 2))
+      : zone.y;
+
   for (let i = 0; i < lines.length; i++) {
-    const lineY = y + i * lineHeightPx;
+    const lineY = startY + i * lineHeightPx;
     const line = lines[i];
 
     // Check if this line starts with (or contains) the label

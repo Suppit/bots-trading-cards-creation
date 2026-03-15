@@ -113,6 +113,8 @@ export const TEXT_ZONES = {
   funFact: {
     x: 97,
     y: 1630,
+    boxTop: 1610,
+    boxHeight: 170,
     maxWidth: 1305,
     fontSize: 53,
     labelFontWeight: '700' as const,
@@ -127,6 +129,8 @@ export const TEXT_ZONES = {
   proTip: {
     x: 97,
     y: 1840,
+    boxTop: 1810,
+    boxHeight: 167,
     maxWidth: 1305,
     fontSize: 53,
     labelFontWeight: '700' as const,
