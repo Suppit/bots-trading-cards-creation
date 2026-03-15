@@ -145,14 +145,14 @@ export function CardReveal() {
 
           {/* Card image with swipe support */}
           <div
-            className="w-full"
+            className="w-full overflow-hidden rounded-3xl shadow-lg"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
             <img
               src={localCardDataUrl}
               alt={`Your BOTS trading card — ${currentSeriesLabel}`}
-              className="w-full rounded-lg shadow-lg"
+              className="w-full block"
               style={{ aspectRatio: '1499 / 2098' }}
               data-testid="card-image"
             />

@@ -95,13 +95,15 @@ export function Export() {
 
         {/* Card preview */}
         {cardDataUrl ? (
-          <img
-            src={cardDataUrl}
-            alt="Your BOTS trading card"
-            className="w-full rounded-lg shadow-lg"
-            style={{ aspectRatio: '1499 / 2098' }}
-            data-testid="export-card-image"
-          />
+          <div className="w-full overflow-hidden rounded-3xl shadow-lg">
+            <img
+              src={cardDataUrl}
+              alt="Your BOTS trading card"
+              className="w-full block"
+              style={{ aspectRatio: '1499 / 2098' }}
+              data-testid="export-card-image"
+            />
+          </div>
         ) : (
           <div className="flex w-full items-center justify-center rounded-lg bg-foreground/5 py-16 text-sm text-foreground/40">
             Card not available
