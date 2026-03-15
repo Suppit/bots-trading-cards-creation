@@ -95,7 +95,7 @@ export function Export() {
 
         {/* Card preview */}
         {cardDataUrl ? (
-          <div className="w-full overflow-hidden rounded-3xl shadow-lg">
+          <div className="w-full overflow-hidden rounded-[6%] shadow-lg">
             <img
               src={cardDataUrl}
               alt="Your BOTS trading card"

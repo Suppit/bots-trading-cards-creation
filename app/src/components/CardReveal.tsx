@@ -145,7 +145,7 @@ export function CardReveal() {
 
           {/* Card image with swipe support */}
           <div
-            className="w-full overflow-hidden rounded-3xl shadow-lg"
+            className="w-full overflow-hidden rounded-[6%] shadow-lg"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
