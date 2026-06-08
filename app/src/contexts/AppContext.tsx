@@ -39,9 +39,13 @@ export interface CardFormData {
 
 export type StylizationStatus = 'idle' | 'processing' | 'complete' | 'failed';
 
+export type PhotoCaptureSubStep = 'select' | 'crop';
+
 interface AppState {
   step: AppStep;
   setStep: (step: AppStep) => void;
+  photoCaptureSubStep: PhotoCaptureSubStep;
+  setPhotoCaptureSubStep: (sub: PhotoCaptureSubStep) => void;
   preloadResult: PreloadResult | null;
   preloadProgress: PreloadProgress | null;
   preloadError: string | null;
@@ -59,6 +63,7 @@ interface AppState {
   setStylizationError: (error: string | null) => void;
   cardDataUrl: string | null;
   setCardDataUrl: (url: string | null) => void;
+  resetSession: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -81,6 +86,7 @@ export function useAppContext(): AppState {
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [step, setStep] = useState<AppStep>('start');
+  const [photoCaptureSubStep, setPhotoCaptureSubStep] = useState<PhotoCaptureSubStep>('select');
   const [preloadResult, setPreloadResult] = useState<PreloadResult | null>(null);
   const [preloadProgress, setPreloadProgress] = useState<PreloadProgress | null>(null);
   const [preloadError, setPreloadError] = useState<string | null>(null);
@@ -124,11 +130,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const isPreloadComplete = preloadResult !== null;
 
+  const resetSession = useCallback(() => {
+    log.info('Session reset — returning to start');
+    setCroppedPhoto(null);
+    setFormData(null);
+    setStylizedPhoto(null);
+    setStylizationStatus('idle');
+    setStylizationError(null);
+    setCardDataUrl(null);
+    setPhotoCaptureSubStep('select');
+    setStep('start');
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
         step,
         setStep,
+        photoCaptureSubStep,
+        setPhotoCaptureSubStep,
         preloadResult,
         preloadProgress,
         preloadError,
@@ -146,6 +166,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setStylizationError,
         cardDataUrl,
         setCardDataUrl,
+        resetSession,
       }}
     >
       {children}

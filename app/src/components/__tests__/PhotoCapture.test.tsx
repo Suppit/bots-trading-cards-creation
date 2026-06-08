@@ -27,6 +27,9 @@ vi.mock('@/contexts/AppContext', () => ({
     setStylizationError: vi.fn(),
     cardDataUrl: null,
     setCardDataUrl: vi.fn(),
+    photoCaptureSubStep: 'select' as const,
+    setPhotoCaptureSubStep: vi.fn(),
+    resetSession: () => mockSetStep('start'),
   }),
 }));
 

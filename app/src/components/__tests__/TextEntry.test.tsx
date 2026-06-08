@@ -27,6 +27,9 @@ vi.mock('@/contexts/AppContext', () => ({
     setStylizationError: vi.fn(),
     cardDataUrl: null,
     setCardDataUrl: vi.fn(),
+    photoCaptureSubStep: 'select' as const,
+    setPhotoCaptureSubStep: vi.fn(),
+    resetSession: vi.fn(),
   }),
 }));
 
@@ -68,7 +71,7 @@ describe('TextEntry', () => {
 
   it('renders the heading', () => {
     render(<TextEntry />);
-    expect(screen.getByText('Add Your Details')).toBeDefined();
+    expect(screen.getByText('3. Add Your Details')).toBeDefined();
   });
 
   it('shows character counters with initial values', () => {
@@ -200,7 +203,7 @@ describe('TextEntry', () => {
 
     // Under 80% — default color
     fireEvent.change(titleInput, { target: { value: 'A'.repeat(20) } });
-    expect(counter.className).toContain('text-foreground/40');
+    expect(counter.className).toContain('text-black/30');
 
     // Over 80% — amber warning
     fireEvent.change(titleInput, { target: { value: 'A'.repeat(25) } });
@@ -236,7 +239,7 @@ describe('TextEntry', () => {
 
     expect(screen.getByTestId('profanity-title')).toBeDefined();
     expect(screen.getByTestId('profanity-title').textContent).toBe(
-      'Please remove inappropriate language',
+      'Please use kind words',
     );
   });
 

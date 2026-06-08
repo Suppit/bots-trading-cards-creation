@@ -47,7 +47,7 @@ export const SERIES: SeriesInfo[] = [
   { id: 'series-2', label: 'Series 2', color: '#D94A6B', framePath: '/frames/series-2.png' },
   { id: 'series-3', label: 'Series 3', color: '#4AD97A', framePath: '/frames/series-3.png' },
   { id: 'series-4', label: 'Series 4', color: '#D9C84A', framePath: '/frames/series-4.png' },
-  { id: 'specialty', label: 'Specialty', color: '#A84AD9', framePath: '/frames/specialty.png' },
+  { id: 'specialty', label: 'Specialty', color: '#A84AD9', framePath: '/frames/specialty-new.png' },
 ];
 
 export const CARD_BACK_PATH = '/frames/back.jpg';
@@ -112,9 +112,9 @@ export const TEXT_ZONES = {
 
   funFact: {
     x: 97,
-    y: 1630,
-    boxTop: 1649,
-    boxHeight: 181,
+    y: 1605,
+    boxTop: 1605,
+    boxHeight: 158,
     maxWidth: 1305,
     fontSize: 53,
     labelFontWeight: '700' as const,
@@ -128,9 +128,9 @@ export const TEXT_ZONES = {
 
   proTip: {
     x: 97,
-    y: 1840,
-    boxTop: 1862,
-    boxHeight: 173,
+    y: 1763,
+    boxTop: 1763,
+    boxHeight: 158,
     maxWidth: 1305,
     fontSize: 53,
     labelFontWeight: '700' as const,

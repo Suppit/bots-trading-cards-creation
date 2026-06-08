@@ -41,11 +41,11 @@ describe('PhotoSelector', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the "Take a selfie" heading', async () => {
+  it('renders the "1. Take a Selfie" heading', async () => {
     await act(async () => {
       render(<PhotoSelector onPhotoSelected={vi.fn()} />);
     });
-    expect(screen.getByText('Take a selfie')).toBeDefined();
+    expect(screen.getByText('1. Take a Selfie')).toBeDefined();
   });
 
   it('shows requesting state initially before camera resolves', () => {
@@ -101,20 +101,9 @@ describe('PhotoSelector', () => {
     expect(screen.getByTestId('ai-disclaimer')).toBeDefined();
   });
 
-  it('renders a back button when onBack prop is provided', async () => {
-    const onBack = vi.fn();
+  it('does not render an inline back button', async () => {
     await act(async () => {
-      render(<PhotoSelector onPhotoSelected={vi.fn()} onBack={onBack} />);
-    });
-    const backBtn = screen.getByTestId('back-to-start');
-    expect(backBtn).toBeDefined();
-    await act(async () => { backBtn.click(); });
-    expect(onBack).toHaveBeenCalledOnce();
-  });
-
-  it('does not render a back button when onBack prop is omitted', async () => {
-    await act(async () => {
-      render(<PhotoSelector onPhotoSelected={vi.fn()} />);
+      render(<PhotoSelector onPhotoSelected={vi.fn()} onBack={vi.fn()} />);
     });
     expect(screen.queryByTestId('back-to-start')).toBeNull();
   });

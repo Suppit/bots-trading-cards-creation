@@ -6,7 +6,12 @@ import { createServerLogger } from '@/lib/server-logger';
 
 const log = createServerLogger('stylize');
 
-const STYLE_PROMPT = `Apply the artistic style of the first image to the second image. The first image is a reference showing manga-looking characters with vibrant colors and a light yellow haze. Transform the person in the second image into this illustrated manga art style while preserving their likeness, pose, and setting.`;
+const STYLE_PROMPT = `Apply the artistic style of the first image to the second image. The first image is a reference showing cheerful manga-style illustrated characters with vibrant, warm colors and a soft golden haze. Transform the person in the second image into this illustrated manga art style while:
+- Faithfully preserving their facial features, skin tone, hair, and expression exactly as they appear
+- Applying the same bright, positive, age-appropriate artistic style to every person equally, regardless of how they look
+- Keeping the output celebratory, wholesome, and suitable for children
+- Avoiding any stereotyping, exaggeration, or bias based on race, ethnicity, or appearance
+The result must be a joyful, child-appropriate trading card portrait.`;
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID().slice(0, 8);
@@ -73,7 +78,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ imageBase64 });
+    return NextResponse.json(
+      { imageBase64 },
+      { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } },
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     log.error('Stylization failed', {

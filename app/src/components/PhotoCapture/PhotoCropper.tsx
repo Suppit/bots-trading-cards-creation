@@ -39,10 +39,10 @@ export function PhotoCropper({ file, onCropComplete, onBack }: PhotoCropperProps
     let cropW: number;
     let cropH: number;
     if (width / height > aspect) {
-      cropH = height * 0.85;
+      cropH = height;
       cropW = cropH * aspect;
     } else {
-      cropW = width * 0.85;
+      cropW = width;
       cropH = cropW / aspect;
     }
 
@@ -107,18 +107,20 @@ export function PhotoCropper({ file, onCropComplete, onBack }: PhotoCropperProps
 
   if (!imageSrc) {
     return (
-      <div className="flex min-h-dvh items-center justify-center">
+      <div className="flex items-center justify-center py-20">
         <p className="text-foreground/50">Loading image...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-between px-4 py-6">
+    <div className="flex flex-col items-center gap-4">
       <div className="w-full text-center">
-        <h2 className="text-xl font-bold">Crop Your Photo</h2>
-        <p className="mt-1 text-sm text-foreground/60">
-          Adjust the crop area for your card portrait
+        <h1 className="mb-2 font-bebas text-4xl sm:text-5xl">
+          <span className="heading-gradient">2. Crop Your Photo</span>
+        </h1>
+        <p className="text-[18px] font-medium text-black">
+          Adjust the crop area for your card portrait.
         </p>
       </div>
 
@@ -141,18 +143,18 @@ export function PhotoCropper({ file, onCropComplete, onBack }: PhotoCropperProps
         </ReactCrop>
       </div>
 
-      <div className="flex w-full max-w-md flex-col gap-3">
+      <div className="flex w-full max-w-md flex-col gap-3 mt-4">
         <button
           onClick={handleUsePhoto}
           disabled={!completedCrop || processing}
-          className="min-h-[48px] w-full rounded-full bg-[#035ba7] px-8 py-4 text-lg font-bold text-white transition-colors hover:bg-[#024a8a] active:bg-[#013d73] disabled:opacity-50"
+          className="min-h-[52px] w-full rounded-full bg-[#035ba7] px-8 py-4 text-lg font-bold text-white transition-colors hover:bg-[#024a8a] active:bg-[#013d73] disabled:opacity-50"
         >
           {processing ? 'Processing...' : 'Use This Photo'}
         </button>
         <button
           onClick={onBack}
           disabled={processing}
-          className="min-h-[48px] w-full rounded-full border border-foreground/20 px-8 py-3 text-sm font-medium transition-colors hover:bg-foreground/5 disabled:opacity-50"
+          className="min-h-[48px] w-full rounded-full border border-black/15 px-8 py-3 text-sm font-medium transition-colors hover:bg-black/5 disabled:opacity-50"
         >
           Choose Different Photo
         </button>

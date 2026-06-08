@@ -194,18 +194,12 @@ export function PhotoSelector({ onPhotoSelected, onBack }: PhotoSelectorProps) {
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
-      {onBack && (
-        <div className="flex w-full max-w-md">
-          <button
-            onClick={onBack}
-            className="flex min-h-[44px] items-center gap-1 text-sm font-semibold text-[#035ba7]"
-            data-testid="back-to-start"
-          >
-            ← Back
-          </button>
-        </div>
-      )}
-      <h2 className="text-xl font-bold">Take a selfie</h2>
+      <div className="w-full text-center">
+        <h1 className="mb-2 font-bebas text-4xl sm:text-5xl">
+          <span className="heading-gradient">1. Take a Selfie</span>
+        </h1>
+        <p className="text-[18px] font-medium text-black">Pose and press the blue button.</p>
+      </div>
 
       {/* Hidden canvas for capture */}
       <canvas ref={canvasRef} className="hidden" />

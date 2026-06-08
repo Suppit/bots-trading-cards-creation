@@ -40,6 +40,9 @@ vi.mock('@/contexts/AppContext', () => ({
     },
     cardDataUrl: null,
     setCardDataUrl: vi.fn(),
+    photoCaptureSubStep: 'select' as const,
+    setPhotoCaptureSubStep: vi.fn(),
+    resetSession: vi.fn(),
   }),
 }));
 
@@ -77,7 +80,7 @@ describe('CardReveal', () => {
 
   it('shows loading state initially', () => {
     render(<CardReveal />);
-    expect(screen.getByText('Generating your card...')).toBeDefined();
+    expect(screen.getByText('Generating your card…')).toBeDefined();
   });
 
   it('renders the card image after successful render', async () => {
@@ -140,7 +143,7 @@ describe('CardReveal', () => {
   it('navigates back to text-entry when Back is clicked', async () => {
     await renderAndWait();
     await act(async () => {
-      screen.getByTestId('back-button').click();
+      screen.getByRole('button', { name: 'Go to previous step' }).click();
     });
     expect(mockSetStep).toHaveBeenCalledWith('text-entry');
   });

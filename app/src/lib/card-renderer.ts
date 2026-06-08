@@ -60,10 +60,7 @@ export async function renderCard(
   ctx.font = `${tz.fontStyle} ${tz.fontWeight} ${tz.fontSize}px Aileron`;
   const titleTextWidth = ctx.measureText(input.formData.title).width;
   const titleRightEdge = tz.x + titleTextWidth;
-  const bannerPath =
-    titleRightEdge > titleBanner.widthThreshold
-      ? titleBanner.longPath
-      : titleBanner.shortPath;
+  const bannerPath = titleBanner.shortPath;
   const bannerImg = await loadUrlImage(bannerPath);
   ctx.drawImage(bannerImg, titleBanner.x, titleBanner.y);
   log.info('Layer rendered: title banner', { variant: bannerPath, titleRightEdge: Math.round(titleRightEdge) });

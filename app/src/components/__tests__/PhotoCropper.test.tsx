@@ -59,23 +59,23 @@ describe('PhotoCropper', () => {
     render(
       <PhotoCropper file={createMockFile()} onCropComplete={vi.fn()} onBack={vi.fn()} />,
     );
-    expect(screen.getByText('Crop Your Photo')).toBeDefined();
+    expect(screen.getByText('2. Crop Your Photo')).toBeDefined();
   });
 
   it('renders the subtitle', () => {
     render(
       <PhotoCropper file={createMockFile()} onCropComplete={vi.fn()} onBack={vi.fn()} />,
     );
-    expect(screen.getByText('Adjust the crop area for your card portrait')).toBeDefined();
+    expect(screen.getByText('Adjust the crop area for your card portrait.')).toBeDefined();
   });
 
-  it('renders "Use This Photo" button with 48px+ touch target', () => {
+  it('renders "Use This Photo" button with 52px+ touch target', () => {
     render(
       <PhotoCropper file={createMockFile()} onCropComplete={vi.fn()} onBack={vi.fn()} />,
     );
     const button = screen.getByRole('button', { name: 'Use This Photo' });
     expect(button).toBeDefined();
-    expect(button.className).toContain('min-h-[48px]');
+    expect(button.className).toContain('min-h-[52px]');
   });
 
   it('renders "Choose Different Photo" button', () => {

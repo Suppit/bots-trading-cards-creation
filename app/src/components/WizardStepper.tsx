@@ -1,83 +1,92 @@
 'use client';
 
+import { useAppContext } from '@/contexts/AppContext';
 import type { AppStep } from '@/contexts/AppContext';
 
-const WIZARD_STEPS = [
-  { label: 'Photo', steps: ['photo-capture'] },
-  { label: 'Text', steps: ['text-entry'] },
-  { label: 'Card', steps: ['card-reveal', 'series-swipe', 'export'] },
-] as const;
+const STEPS = ['Photo', 'Crop', 'Text'] as const;
 
-function getActiveIndex(currentStep: AppStep): number {
-  return WIZARD_STEPS.findIndex((ws) =>
-    (ws.steps as readonly string[]).includes(currentStep),
-  );
+function getActiveIndex(step: AppStep, subStep: 'select' | 'crop'): number {
+  if (step === 'photo-capture' && subStep === 'select') return 0;
+  if (step === 'photo-capture' && subStep === 'crop') return 1;
+  if (step === 'text-entry') return 2;
+  if (step === 'card-reveal' || step === 'export') return 3; // all fulfilled
+  return -1;
 }
 
-interface WizardStepperProps {
-  currentStep: AppStep;
-}
+export function WizardStepper() {
+  const { step, photoCaptureSubStep } = useAppContext();
 
-export function WizardStepper({ currentStep }: WizardStepperProps) {
-  if (currentStep === 'start') return null;
+  if (step === 'start') return null;
 
-  const activeIndex = getActiveIndex(currentStep);
+  const activeIndex = getActiveIndex(step, photoCaptureSubStep);
 
   return (
-    <nav aria-label="Progress" className="flex w-full items-center justify-center gap-2 px-6 py-4">
-      {WIZARD_STEPS.map((ws, i) => {
-        const isCompleted = i < activeIndex;
-        const isActive = i === activeIndex;
+    <nav
+      aria-label="Progress"
+      className="flex w-full items-center justify-center py-4"
+    >
+      <div className="flex items-center">
+        {STEPS.map((label, i) => {
+          const isCompleted = i < activeIndex;
+          const isActive = i === activeIndex;
 
-        return (
-          <div key={ws.label} className="flex items-center gap-2">
-            {i > 0 && (
-              <div
-                className={`h-0.5 w-6 transition-colors ${
-                  isCompleted ? 'bg-[#035ba7]' : 'bg-foreground/15'
-                }`}
-              />
-            )}
-            <div className="flex flex-col items-center gap-1">
-              <div
-                className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors ${
-                  isCompleted
-                    ? 'bg-[#035ba7] text-white'
-                    : isActive
-                      ? 'border-2 border-[#035ba7] text-[#035ba7]'
-                      : 'border-2 border-foreground/20 text-foreground/40'
-                }`}
-              >
-                {isCompleted ? (
-                  <svg
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    className="h-3.5 w-3.5"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M3.5 8.5L6.5 11.5L12.5 4.5"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                ) : (
-                  i + 1
-                )}
+          return (
+            <div key={label} className="flex items-center">
+              {/* Connecting dash before each step except the first */}
+              {i > 0 && (
+                <div
+                  className={`mx-1 h-[3px] w-[80px] rounded-full transition-colors sm:w-[120px] ${
+                    i <= activeIndex ? 'bg-[#035ba7]' : 'bg-black/15'
+                  }`}
+                />
+              )}
+
+              {/* Step circle + label */}
+              <div className="flex flex-col items-center gap-1.5">
+                <div
+                  className={`flex h-[44px] w-[44px] items-center justify-center rounded-full transition-all ${
+                    isCompleted
+                      ? 'bg-[#035ba7] text-white'
+                      : isActive
+                      ? 'bg-[#035ba7] text-white'
+                      : 'border-2 border-black/20 bg-white/60 text-black/40'
+                  }`}
+                >
+                  {isCompleted ? (
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M3 8.5L6.5 12L13 4"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  ) : (
+                    <span className="text-sm font-bold">{i + 1}</span>
+                  )}
+                </div>
+                <span
+                  className={`text-xs font-semibold ${
+                    isActive
+                      ? 'text-[#035ba7]'
+                      : isCompleted
+                      ? 'text-black/50'
+                      : 'text-black/30'
+                  }`}
+                >
+                  {label}
+                </span>
               </div>
-              <span
-                className={`text-xs font-medium ${
-                  isActive ? 'text-[#035ba7]' : isCompleted ? 'text-foreground/60' : 'text-foreground/40'
-                }`}
-              >
-                {ws.label}
-              </span>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </nav>
   );
 }

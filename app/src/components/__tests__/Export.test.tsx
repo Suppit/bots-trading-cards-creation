@@ -28,6 +28,9 @@ function makeMockContext(overrides: Record<string, unknown> = {}) {
     setStylizationStatus: vi.fn(),
     stylizationError: null,
     setStylizationError: vi.fn(),
+    photoCaptureSubStep: 'select' as const,
+    setPhotoCaptureSubStep: vi.fn(),
+    resetSession: vi.fn(),
     ...overrides,
   };
 }
@@ -59,7 +62,7 @@ describe('Export', () => {
 
   it('renders the heading', () => {
     render(<Export />);
-    expect(screen.getByText('Your Card is Ready!')).toBeDefined();
+    expect(screen.getByText('Check it out!')).toBeDefined();
   });
 
   it('displays the card image when cardDataUrl is set', () => {
@@ -99,13 +102,12 @@ describe('Export', () => {
 
   it('back button navigates to card-reveal', () => {
     render(<Export />);
-    fireEvent.click(screen.getByTestId('back-button'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to previous step' }));
     expect(mockSetStep).toHaveBeenCalledWith('card-reveal');
   });
 
-  it('does not render share button when Web Share API is unavailable', () => {
-    // navigator.share is undefined in jsdom
+  it('always renders the save/download button', () => {
     render(<Export />);
-    expect(screen.queryByTestId('share-button')).toBeNull();
+    expect(screen.getByTestId('download-button')).toBeDefined();
   });
 });
