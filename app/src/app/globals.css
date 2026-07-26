@@ -76,12 +76,23 @@
 
 body {
   background-color: var(--background);
-  background-image: url('/rainbow-gradient.png'), url('/cardstock-texture.jpg');
-  background-size: cover, cover;
-  background-attachment: fixed, fixed;
-  background-repeat: no-repeat, no-repeat;
+  background-image: url('/cardstock-texture.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--foreground);
   font-family: var(--font-figtree), 'Figtree', Arial, Helvetica, sans-serif;
+}
+
+/* ----- Home page rainbow gradient overlay (sits on top of the cardstock body background) ----- */
+
+.home-gradient-bg {
+  background-image: url('/rainbow-gradient.png');
+  background-size: cover;
+  background-position: center -50px;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 /* ----- Carousel animation ----- */

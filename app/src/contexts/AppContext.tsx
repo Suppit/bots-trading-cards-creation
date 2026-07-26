@@ -12,13 +12,7 @@ const log = createLogger('AppContext');
 // Types
 // ---------------------------------------------------------------------------
 
-export type AppStep =
-  | 'start'
-  | 'photo-capture'
-  | 'text-entry'
-  | 'card-reveal'
-  | 'series-swipe'
-  | 'export';
+export type AppStep = 'start' | 'photo-capture' | 'text-entry' | 'card-reveal';
 
 export interface PhotoData {
   blob: Blob;

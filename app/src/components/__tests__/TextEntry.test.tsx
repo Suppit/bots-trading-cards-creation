@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
 import { TextEntry } from '../TextEntry';
 
 const mockSetStep = vi.fn();
@@ -123,7 +123,7 @@ describe('TextEntry', () => {
     expect(button.hasAttribute('disabled')).toBe(false);
   });
 
-  it('calls setFormData and setStep on valid submission', () => {
+  it('calls setFormData and setStep on valid submission', async () => {
     render(<TextEntry />);
     fireEvent.change(screen.getByTestId('field-title'), {
       target: { value: 'My Title' },
@@ -147,7 +147,8 @@ describe('TextEntry', () => {
       proTip: 'My Pro Tip',
       proTipLabel: 'Pro Tip',
     });
-    expect(mockSetStep).toHaveBeenCalledWith('card-reveal');
+    // setStep fires after the fade-out transition, not immediately
+    await waitFor(() => expect(mockSetStep).toHaveBeenCalledWith('card-reveal'));
   });
 
   it('trims whitespace from values on submission', () => {

@@ -7,7 +7,6 @@ import { HomePage } from './HomePage';
 import { PhotoCapture } from './PhotoCapture';
 import { TextEntry } from './TextEntry';
 import { CardReveal } from './CardReveal';
-import { Export } from './Export';
 import { PlaceholderScreen } from './PlaceholderScreen';
 import { createLogger } from '@/lib/logger';
 
@@ -36,8 +35,6 @@ export function AppFlow() {
         return <TextEntry />;
       case 'card-reveal':
         return <CardReveal />;
-      case 'export':
-        return <Export />;
       default:
         return <PlaceholderScreen step={step} />;
     }

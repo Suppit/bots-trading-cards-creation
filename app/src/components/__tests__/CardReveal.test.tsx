@@ -1,9 +1,11 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup, act, waitFor } from '@testing-library/react';
+import { render, screen, cleanup, act, waitFor, fireEvent } from '@testing-library/react';
 import { CardReveal } from '../CardReveal';
 
 const mockSetStep = vi.fn();
+const mockSetCardDataUrl = vi.fn();
+const mockResetSession = vi.fn();
 
 const mockFormData = {
   title: 'Test Title',
@@ -30,19 +32,13 @@ vi.mock('@/contexts/AppContext', () => ({
     stylizedPhoto: null,
     formData: mockFormData,
     preloadResult: {
-      frames: new Map([
-        ['specialty', mockFrame],
-        ['series-1', mockFrame],
-        ['series-2', mockFrame],
-        ['series-3', mockFrame],
-        ['series-4', mockFrame],
-      ]),
+      frames: new Map([['specialty', mockFrame]]),
     },
     cardDataUrl: null,
-    setCardDataUrl: vi.fn(),
+    setCardDataUrl: mockSetCardDataUrl,
     photoCaptureSubStep: 'select' as const,
     setPhotoCaptureSubStep: vi.fn(),
-    resetSession: vi.fn(),
+    resetSession: mockResetSession,
   }),
 }));
 
@@ -61,6 +57,12 @@ vi.mock('@/lib/card-renderer', () => ({
   }),
 }));
 
+// lottie-web probes for canvas 2D context support at import time, which jsdom
+// doesn't provide — stub it out so the confetti overlay doesn't crash tests.
+vi.mock('lottie-react', () => ({
+  default: () => null,
+}));
+
 async function renderAndWait() {
   render(<CardReveal />);
   await waitFor(() => expect(screen.getByTestId('card-image')).toBeDefined(), {
@@ -76,6 +78,9 @@ describe('CardReveal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      blob: () => Promise.resolve(new Blob(['card'], { type: 'image/png' })),
+    }));
   });
 
   it('shows loading state initially', () => {
@@ -88,56 +93,16 @@ describe('CardReveal', () => {
     expect(screen.getByTestId('card-image')).toBeDefined();
   });
 
-  it('defaults to Specialty series label', async () => {
+  it('renders the "Check it out!" heading', async () => {
     await renderAndWait();
-    expect(screen.getByTestId('series-label').textContent).toBe('Specialty');
+    expect(screen.getByText('Check it out!')).toBeDefined();
   });
 
-  it('shows 5 series dots', async () => {
+  it('renders the create-another, add-to-home, and share buttons', async () => {
     await renderAndWait();
-    for (let i = 0; i < 5; i++) {
-      expect(screen.getByTestId(`series-dot-${i}`)).toBeDefined();
-    }
-  });
-
-  it('navigates to next series when next button is clicked', async () => {
-    await renderAndWait();
-    await act(async () => {
-      screen.getByTestId('series-next').click();
-    });
-    await waitFor(() =>
-      expect(screen.getByTestId('series-label').textContent).toBe('Series 1'),
-    );
-  });
-
-  it('wraps from Series 4 back to Specialty on next', async () => {
-    await renderAndWait();
-    // Navigate to Series 4 (index 4) by clicking next 4 times
-    for (let i = 0; i < 4; i++) {
-      await act(async () => {
-        screen.getByTestId('series-next').click();
-      });
-    }
-    await waitFor(() =>
-      expect(screen.getByTestId('series-label').textContent).toBe('Series 4'),
-    );
-    // One more wraps back to Specialty
-    await act(async () => {
-      screen.getByTestId('series-next').click();
-    });
-    await waitFor(() =>
-      expect(screen.getByTestId('series-label').textContent).toBe('Specialty'),
-    );
-  });
-
-  it('wraps from Specialty to Series 4 on prev', async () => {
-    await renderAndWait();
-    await act(async () => {
-      screen.getByTestId('series-prev').click();
-    });
-    await waitFor(() =>
-      expect(screen.getByTestId('series-label').textContent).toBe('Series 4'),
-    );
+    expect(screen.getByTestId('create-another-button')).toBeDefined();
+    expect(screen.getByTestId('add-to-home-button')).toBeDefined();
+    expect(screen.getByTestId('share-button')).toBeDefined();
   });
 
   it('navigates back to text-entry when Back is clicked', async () => {
@@ -148,11 +113,15 @@ describe('CardReveal', () => {
     expect(mockSetStep).toHaveBeenCalledWith('text-entry');
   });
 
-  it('navigates to export when Save Card is clicked', async () => {
+  it('resets the session when Create another is clicked', async () => {
     await renderAndWait();
-    await act(async () => {
-      screen.getByTestId('save-button').click();
-    });
-    expect(mockSetStep).toHaveBeenCalledWith('export');
+    fireEvent.click(screen.getByTestId('create-another-button'));
+    expect(mockResetSession).toHaveBeenCalled();
+  });
+
+  it('resets the session when Home is clicked', async () => {
+    await renderAndWait();
+    fireEvent.click(screen.getByRole('button', { name: 'Go to home' }));
+    expect(mockResetSession).toHaveBeenCalled();
   });
 });

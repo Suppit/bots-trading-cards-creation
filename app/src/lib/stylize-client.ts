@@ -4,12 +4,12 @@ import { PORTRAIT_ASPECT_RATIO, PORTRAIT } from './layout-constants';
 const log = createLogger('StylizeClient');
 
 /**
- * Crops a source image from its original aspect ratio to 114:97,
- * outputting at the PORTRAIT dimensions (1305×1111) for direct card use.
+ * Crops a source image from its original aspect ratio to match the portrait
+ * window, outputting at the PORTRAIT dimensions for direct card use.
  */
 function cropToPortraitAspect(img: HTMLImageElement): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    const targetAspect = PORTRAIT_ASPECT_RATIO; // 114/97 ≈ 1.175
+    const targetAspect = PORTRAIT_ASPECT_RATIO;
     const srcAspect = img.width / img.height;
 
     let sx = 0;
@@ -28,8 +28,8 @@ function cropToPortraitAspect(img: HTMLImageElement): Promise<Blob> {
     }
 
     const canvas = document.createElement('canvas');
-    canvas.width = PORTRAIT.width;   // 1305
-    canvas.height = PORTRAIT.height; // 1111
+    canvas.width = PORTRAIT.width;
+    canvas.height = PORTRAIT.height;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {

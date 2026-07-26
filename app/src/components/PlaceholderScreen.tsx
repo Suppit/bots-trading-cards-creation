@@ -8,8 +8,6 @@ const STEP_LABELS: Record<AppStep, string> = {
   'photo-capture': 'Photo Capture & Crop',
   'text-entry': 'Text Entry',
   'card-reveal': 'Card Reveal',
-  'series-swipe': 'Series Swipe',
-  export: 'Export & Share',
 };
 
 export function PlaceholderScreen({ step }: { step: AppStep }) {
@@ -35,8 +33,6 @@ function getPhaseNumber(step: AppStep): number {
     'photo-capture': 4,
     'text-entry': 6,
     'card-reveal': 7,
-    'series-swipe': 8,
-    export: 9,
   };
   return phases[step] ?? 0;
 }

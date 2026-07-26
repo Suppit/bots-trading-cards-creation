@@ -19,14 +19,21 @@ export const CARD_HEIGHT = 2098;
 // Portrait window (where the stylized photo is drawn behind the frame)
 // ---------------------------------------------------------------------------
 
-/** Aspect ratio of the portrait mask, derived from actual frame window (1231×1043). */
-export const PORTRAIT_ASPECT_RATIO = 1231 / 1043;
+/**
+ * Aspect ratio of the portrait mask. Measured directly from specialty-new.png's
+ * alpha channel — the only frame rendered now that series selection has been
+ * removed (transparent window sits at card-space x:136-1367, y:260-1303 once
+ * the 1500x2100 frame art is scaled down to the 1499x2098 card canvas). A
+ * small safety margin is added so the portrait fully covers the window —
+ * any overdraw is masked by the frame layer, which is composited on top.
+ */
+export const PORTRAIT_ASPECT_RATIO = 1237 / 1049;
 
 export const PORTRAIT = {
-  x: 135,
+  x: 133,
   y: 257,
-  width: 1231,
-  height: 1043,
+  width: 1237,
+  height: 1049,
 } as const;
 
 // ---------------------------------------------------------------------------

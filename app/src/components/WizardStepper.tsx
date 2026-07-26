@@ -9,7 +9,7 @@ function getActiveIndex(step: AppStep, subStep: 'select' | 'crop'): number {
   if (step === 'photo-capture' && subStep === 'select') return 0;
   if (step === 'photo-capture' && subStep === 'crop') return 1;
   if (step === 'text-entry') return 2;
-  if (step === 'card-reveal' || step === 'export') return 3; // all fulfilled
+  if (step === 'card-reveal') return 3; // all fulfilled
   return -1;
 }
 

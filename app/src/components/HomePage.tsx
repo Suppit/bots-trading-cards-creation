@@ -16,16 +16,19 @@ const STEPS = [
     number: 1,
     title: 'Add a Photo',
     body: 'Take a selfie or upload a photo from your device. Your photo will be transformed into a unique illustrated portrait.',
+    animation: '/animations/step-1.svg',
   },
   {
     number: 2,
     title: 'Add Your Details',
     body: 'Give your card a title, tagline, fun fact, and a personal touch. These appear right on your finished card.',
+    animation: '/animations/step-2.svg',
   },
   {
     number: 3,
     title: 'Download and Share',
     body: 'Keep this memory for yourself or share your custom BOTS card with the world!',
+    animation: '/animations/step-3.svg',
   },
 ];
 
@@ -60,23 +63,13 @@ export function HomePage() {
   const buttonReady = isPreloadComplete && !preloadError;
 
   return (
-    <div className="flex min-h-dvh flex-col overflow-x-hidden">
+    <div className="home-gradient-bg flex min-h-dvh flex-col overflow-x-hidden">
 
       {/* ── Card carousel ── */}
       <div
         className="relative h-[220px] overflow-hidden sm:h-[280px]"
         aria-hidden="true"
       >
-        {/* Edge fade */}
-        <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-white/80 to-transparent"
-          style={{ backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.85) 0%, transparent 100%)' }}
-        />
-        <div
-          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-white/80 to-transparent"
-          style={{ backgroundImage: 'linear-gradient(to left, rgba(255,255,255,0.85) 0%, transparent 100%)' }}
-        />
-
         <div className="carousel-strip flex h-full items-center gap-4 px-2">
           {CAROUSEL_ITEMS.map((src, i) => {
             const rotation = CAROUSEL_ROTATIONS[i % CAROUSEL_ROTATIONS.length];
@@ -174,8 +167,18 @@ export function HomePage() {
                 <span className="text-base font-semibold text-[#035ba7]">{step.title}</span>
               </div>
 
-              {/* Placeholder illustration */}
-              <div className="h-48 w-full rounded-2xl border border-black/10 bg-white/50 sm:h-56" />
+              {/* Step illustration */}
+              {step.animation ? (
+                <div className="flex w-full items-center justify-center rounded-2xl border border-black/10 bg-white/50">
+                  <img
+                    src={step.animation}
+                    alt={`Step ${step.number} animation`}
+                    className="w-full rounded-2xl"
+                  />
+                </div>
+              ) : (
+                <div className="h-48 w-full rounded-2xl border border-black/10 bg-white/50 sm:h-56" />
+              )}
 
               {/* Body */}
               <p className="text-[18px] font-medium text-black leading-relaxed">{step.body}</p>
