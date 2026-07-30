@@ -42,6 +42,8 @@ export function CardReveal() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [useOriginalPhoto, setUseOriginalPhoto] = useState(false);
+  const [isSwitchingPhoto, setIsSwitchingPhoto] = useState(false);
 
   const entranceStarted = useRef(false);
   const rafRef = useRef<number | null>(null);
@@ -49,41 +51,69 @@ export function CardReveal() {
   const [restUiVisible, setRestUiVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const portrait = stylizedPhoto ?? croppedPhoto?.blob ?? null;
   const frame = preloadResult?.frames.get('specialty') ?? null;
+  const initialPortrait = stylizedPhoto ?? croppedPhoto?.blob ?? null;
 
-  const doRender = useCallback(async () => {
-    if (!portrait || !frame || !formData) {
-      log.error('Missing data for card render', {
-        hasPortrait: !!portrait,
-        hasFrame: !!frame,
-        hasFormData: !!formData,
-      });
-      setErrorMessage('Missing photo or text data');
-      setRenderState('error');
-      return;
-    }
-    setRenderState('loading');
-    setErrorMessage(null);
-    try {
-      const canvas = await renderCard({ frame, portrait, formData });
-      const dataUrl = canvas.toDataURL('image/png');
-      setLocalCardDataUrl(dataUrl);
-      setCardDataUrl(dataUrl);
-      setRenderState('ready');
-      log.info('Card rendered');
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      log.error('Card render failed', { error: message });
-      setErrorMessage(message);
-      setRenderState('error');
-    }
-  }, [portrait, frame, formData, setCardDataUrl]);
+  const renderWithPortrait = useCallback(
+    async (portrait: Blob | null, { isInitial }: { isInitial: boolean }) => {
+      if (!portrait || !frame || !formData) {
+        log.error('Missing data for card render', {
+          hasPortrait: !!portrait,
+          hasFrame: !!frame,
+          hasFormData: !!formData,
+        });
+        if (isInitial) {
+          setErrorMessage('Missing photo or text data');
+          setRenderState('error');
+        }
+        return;
+      }
+      if (isInitial) {
+        setRenderState('loading');
+        setErrorMessage(null);
+      } else {
+        setIsSwitchingPhoto(true);
+      }
+      try {
+        const canvas = await renderCard({ frame, portrait, formData });
+        const dataUrl = canvas.toDataURL('image/png');
+        setLocalCardDataUrl(dataUrl);
+        setCardDataUrl(dataUrl);
+        if (isInitial) setRenderState('ready');
+        log.info('Card rendered', { useOriginalPhoto: !isInitial });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        log.error('Card render failed', { error: message });
+        if (isInitial) {
+          setErrorMessage(message);
+          setRenderState('error');
+        }
+      } finally {
+        if (!isInitial) setIsSwitchingPhoto(false);
+      }
+    },
+    [frame, formData, setCardDataUrl],
+  );
+
+  const doRender = useCallback(() => {
+    renderWithPortrait(initialPortrait, { isInitial: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [renderWithPortrait]);
 
   useEffect(() => {
     doRender();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleTogglePhotoSource = useCallback(
+    (checked: boolean) => {
+      log.info('Photo source toggled', { useOriginalPhoto: checked });
+      setUseOriginalPhoto(checked);
+      const nextPortrait = checked ? croppedPhoto?.blob ?? null : stylizedPhoto ?? croppedPhoto?.blob ?? null;
+      renderWithPortrait(nextPortrait, { isInitial: false });
+    },
+    [croppedPhoto, stylizedPhoto, renderWithPortrait],
+  );
 
   // Final reveal sequence: card fades in + scales down once, then the rest of
   // the UI (nav, heading, buttons) and a confetti burst follow.
@@ -254,6 +284,24 @@ export function CardReveal() {
               </p>
             </div>
 
+            {/* Photo-source toggle — fades in with the rest of the reveal UI */}
+            {stylizedPhoto && (
+              <label
+                className={`flex items-center gap-2 text-sm font-medium text-[#323338] transition-opacity duration-500 ease-out ${
+                  restUiVisible ? 'opacity-100' : 'pointer-events-none opacity-0'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={useOriginalPhoto}
+                  onChange={(e) => handleTogglePhotoSource(e.target.checked)}
+                  className="h-4 w-4 rounded border-black/30 text-[#035ba7] focus:ring-[#035ba7]/30"
+                  data-testid="use-original-photo-checkbox"
+                />
+                I don&apos;t want my photo to be stylized
+              </label>
+            )}
+
             {/* Card — fades in + scales down once on first reveal */}
             <div
               className="overflow-hidden transition-all ease-out"
@@ -270,7 +318,9 @@ export function CardReveal() {
               <img
                 src={localCardDataUrl}
                 alt="Your BOTS trading card"
-                className="block h-full w-full object-cover"
+                className={`block h-full w-full object-cover transition-opacity duration-200 ${
+                  isSwitchingPhoto ? 'opacity-50' : 'opacity-100'
+                }`}
                 data-testid="card-image"
               />
             </div>

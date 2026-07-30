@@ -16,20 +16,24 @@ const mockFormData = {
 };
 
 const mockFrame = {} as HTMLImageElement;
+const mockCroppedPhotoBlob = new Blob(['photo'], { type: 'image/jpeg' });
+let mockStylizedPhoto: Blob | null = null;
 
 vi.mock('@/contexts/AppContext', () => ({
   useAppContext: () => ({
     step: 'card-reveal',
     setStep: mockSetStep,
     croppedPhoto: {
-      blob: new Blob(['photo'], { type: 'image/jpeg' }),
+      blob: mockCroppedPhotoBlob,
       width: 1231,
       height: 1043,
       originalWidth: 1231,
       originalHeight: 1043,
       originalSizeKB: 10,
     },
-    stylizedPhoto: null,
+    get stylizedPhoto() {
+      return mockStylizedPhoto;
+    },
     formData: mockFormData,
     preloadResult: {
       frames: new Map([['specialty', mockFrame]]),
@@ -51,10 +55,12 @@ vi.mock('@/lib/logger', () => ({
   }),
 }));
 
+const mockRenderCard = vi.fn().mockResolvedValue({
+  toDataURL: () => 'data:image/png;base64,mockdata',
+});
+
 vi.mock('@/lib/card-renderer', () => ({
-  renderCard: vi.fn().mockResolvedValue({
-    toDataURL: () => 'data:image/png;base64,mockdata',
-  }),
+  renderCard: (...args: unknown[]) => mockRenderCard(...args),
 }));
 
 // lottie-web probes for canvas 2D context support at import time, which jsdom
@@ -78,6 +84,7 @@ describe('CardReveal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockStylizedPhoto = null;
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       blob: () => Promise.resolve(new Blob(['card'], { type: 'image/png' })),
     }));
@@ -123,5 +130,39 @@ describe('CardReveal', () => {
     await renderAndWait();
     fireEvent.click(screen.getByRole('button', { name: 'Go to home' }));
     expect(mockResetSession).toHaveBeenCalled();
+  });
+
+  it('does not render the photo-source checkbox when there is no stylized photo', async () => {
+    await renderAndWait();
+    expect(screen.queryByTestId('use-original-photo-checkbox')).toBeNull();
+  });
+
+  it('renders the photo-source checkbox, unchecked by default, when a stylized photo exists', async () => {
+    mockStylizedPhoto = new Blob(['stylized'], { type: 'image/jpeg' });
+    await renderAndWait();
+    const checkbox = screen.getByTestId('use-original-photo-checkbox') as HTMLInputElement;
+    expect(checkbox.checked).toBe(false);
+  });
+
+  it('re-renders with the original photo when the checkbox is checked, and with the stylized photo when unchecked', async () => {
+    mockStylizedPhoto = new Blob(['stylized'], { type: 'image/jpeg' });
+    await renderAndWait();
+    mockRenderCard.mockClear();
+
+    const checkbox = screen.getByTestId('use-original-photo-checkbox') as HTMLInputElement;
+
+    await act(async () => {
+      fireEvent.click(checkbox);
+    });
+    await waitFor(() => expect(mockRenderCard).toHaveBeenCalledTimes(1));
+    expect(mockRenderCard.mock.calls[0][0].portrait).toBe(mockCroppedPhotoBlob);
+    expect(checkbox.checked).toBe(true);
+
+    await act(async () => {
+      fireEvent.click(checkbox);
+    });
+    await waitFor(() => expect(mockRenderCard).toHaveBeenCalledTimes(2));
+    expect(mockRenderCard.mock.calls[1][0].portrait).toBe(mockStylizedPhoto);
+    expect(checkbox.checked).toBe(false);
   });
 });
